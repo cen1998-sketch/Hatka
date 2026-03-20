@@ -1,5 +1,21 @@
 import { PropertyCardProps } from "@/components/ui/property-card";
 
+export type UserRole = "tenant" | "landlord";
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  fullName: string;
+  phone?: string;
+  role: UserRole;
+  avatar?: string;
+  bookedIds: string[]; // IDs of properties the user has booked
+  likedIds: string[];  // IDs of properties the user has liked
+  listingIds: string[]; // IDs of properties the user has created (as landlord)
+  telegramConnected: boolean;
+  joinedDate: string;
+}
+
 export interface Property extends PropertyCardProps {
   id: string;
   lat: number;

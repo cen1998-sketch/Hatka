@@ -14,7 +14,7 @@ interface ProfileButtonProps {
   name: string;
   role: string;
   avatarSrc?: string;
-  avatarFallback?: string;
+  avatarFallback?: React.ReactNode;
   className?: string;
 }
 

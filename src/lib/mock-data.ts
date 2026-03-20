@@ -1,4 +1,36 @@
-import { Property, PropertyDetail } from "./types";
+import { Property, PropertyDetail, UserProfile, UserRole } from "./types";
+
+export const MOCK_USERS: UserProfile[] = [
+  {
+    id: "user-1",
+    email: "valentina@example.com",
+    fullName: "Валентина Оземпик",
+    role: "landlord",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80",
+    bookedIds: [],
+    likedIds: ["prop-0", "prop-1"],
+    listingIds: ["1", "2", "3", "4", "173897"],
+    telegramConnected: false,
+    joinedDate: "апреля 2024 г.",
+  }
+];
+
+export const getUserByEmail = (email: string): UserProfile | undefined => {
+  return MOCK_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
+};
+
+export const loginUser = async (email: string, role: UserRole): Promise<{ success: boolean; isNewUser: boolean }> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  const user = getUserByEmail(email);
+  if (user) {
+    return { success: true, isNewUser: false };
+  }
+  
+  // If user doesn't exist, we'll "create" them in a real app
+  return { success: true, isNewUser: true };
+};
 
 const images = [
   "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80",
