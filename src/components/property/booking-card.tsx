@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Zap } from "lucide-react";
+import Link from "next/link";
 
 interface BookingCardProps {
   price: string;
@@ -58,10 +59,12 @@ export function BookingCard({ price, basePrice, cancelation }: BookingCardProps)
 
       {/* Booking Button */}
       <div className="flex flex-col gap-2">
-        <Button className="w-full h-11 bg-neutral-950 text-white rounded-2xl hover:bg-neutral-800 flex items-center gap-1.5 border-none">
-          <Zap className="w-4 h-4 fill-white text-white" />
-          <span className="text-sm font-medium">Забронировать</span>
-        </Button>
+        <Link href="/property/1/checkout">
+          <Button className="w-full h-11 bg-neutral-950 text-white rounded-2xl hover:bg-neutral-800 flex items-center gap-1.5 border-none">
+            <Zap className="w-4 h-4 fill-white text-white" />
+            <span className="text-sm font-medium">Забронировать</span>
+          </Button>
+        </Link>
         <p className="text-center text-muted-foreground text-xs font-medium leading-4">
           13 312 ₽ оплатить сейчас – остальное при заселении
         </p>
