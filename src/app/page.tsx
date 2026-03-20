@@ -6,6 +6,7 @@ import { PropertyCard } from "@/components/ui/property-card";
 
 const PROPERTIES = [
   {
+    id: "prop-0",
     image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80",
     title: "Томск, Савиных улица, 4А",
     price: "3 000",
@@ -15,6 +16,7 @@ const PROPERTIES = [
     specs: { guests: "2 гостя", beds: "1 кровать", area: "18м2" },
   },
   {
+    id: "prop-1",
     image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80",
     title: "Томск, проспект Ленина, 121",
     price: "4 500",
@@ -24,6 +26,7 @@ const PROPERTIES = [
     specs: { guests: "4 гостя", beds: "2 кровати", area: "45м2" },
   },
   {
+    id: "prop-2",
     image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80",
     title: "Томск, улица Кирова, 15",
     price: "2 800",
@@ -33,6 +36,7 @@ const PROPERTIES = [
     specs: { guests: "2 гостя", beds: "1 кровать", area: "22м2" },
   },
   {
+    id: "prop-3",
     image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
     title: "Томск, Комсомольский пр-т, 70",
     price: "5 200",
@@ -42,6 +46,7 @@ const PROPERTIES = [
     specs: { guests: "6 гостей", beds: "3 кровати", area: "75м2" },
   },
   {
+    id: "prop-4",
     image: "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80",
     title: "Томск, улица Вершинина, 19",
     price: "3 600",
@@ -51,6 +56,7 @@ const PROPERTIES = [
     specs: { guests: "3 гостя", beds: "2 кровати", area: "36м2" },
   },
   {
+    id: "prop-5",
     image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80",
     title: "Томск, Иркутский тракт, 86",
     price: "6 800",

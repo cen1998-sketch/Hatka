@@ -1,14 +1,11 @@
 "use client";
 
-import { HeaderLogo } from "@/components/ui/header-logo";
+import { Home, Calendar as CalendarIcon, MessageCircle, Heart, Plus } from "lucide-react";
 import { NavButton } from "@/components/ui/nav-button";
 import { ProfileButton } from "@/components/ui/profile-button";
-import {
-  Home,
-  Calendar as CalendarIcon,
-  MessageCircle,
-  Heart,
-} from "lucide-react";
+import { HeaderLogo } from "@/components/ui/header-logo";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function Header() {
   return (
@@ -16,10 +13,12 @@ export function Header() {
       <HeaderLogo />
 
       <div className="hidden lg:flex items-center gap-2">
-        <NavButton
-          icon={<Home className="w-4 h-4" />}
-          label="Сдать жилье"
-        />
+        <Link href="/dashboard">
+          <Button variant="ghost" className="hidden md:flex items-center gap-1 text-sm font-medium hover:bg-neutral-100 px-3">
+            <Plus className="w-4 h-4" />
+            Сдать жилье
+          </Button>
+        </Link>
         <NavButton
           icon={<CalendarIcon className="w-4 h-4" />}
           label="Бронирование"

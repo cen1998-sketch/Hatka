@@ -1,4 +1,4 @@
-import { Property } from "./types";
+import { Property, PropertyDetail } from "./types";
 
 const images = [
   "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80",
@@ -142,4 +142,104 @@ Kвapтиpa нa 100% соотвeтcтвует фoто.
     deadline: "до 16 апреля 2026, 14:00",
     description: "После этого оплата будет возвращена частично.",
   },
+};
+
+export const MOCK_DASHBOARD_LISTINGS: PropertyDetail[] = [
+  {
+    ...MOCK_PROPERTY_DETAIL,
+    id: "1",
+    title: "Квартира",
+    location: "Ленина, д. 2",
+    status: "pending",
+    lastModified: "19 марта 2026, 13:47",
+    propertyType: "Квартира",
+  },
+  {
+    ...MOCK_PROPERTY_DETAIL,
+    id: "2",
+    title: "Квартира",
+    location: "Ленина, д. 2",
+    status: "pending",
+    lastModified: "19 марта 2026, 13:59",
+    propertyType: "Квартира",
+  },
+  {
+    ...MOCK_PROPERTY_DETAIL,
+    id: "3",
+    title: "Квартира",
+    location: "Мира, д. 15",
+    status: "active",
+    lastModified: "20 марта 2026, 10:20",
+    propertyType: "Квартира",
+  },
+  {
+    ...MOCK_PROPERTY_DETAIL,
+    id: "4",
+    title: "Квартира",
+    location: "Советская, д. 5",
+    status: "draft",
+    lastModified: "20 марта 2026, 09:15",
+    propertyType: "Квартира",
+  },
+  {
+    ...MOCK_PROPERTY_DETAIL,
+    id: "173897",
+    title: "Отель 'Гранд Томск'",
+    location: "пр-т Ленина, д. 1",
+    status: "pending",
+    propertyType: "Гостиница",
+    stars: 4,
+    registryNumber: "7723456789",
+    addressDetails: {
+      streetType: "пр-т",
+      streetName: "Ленина",
+      house: "1",
+      city: "Томск"
+    },
+    infrastructure: {
+      internet: "Free",
+      parking: "Paid",
+      yearBuilt: 2020,
+      roomCount: 45,
+      paymentMethods: ["Cash", "Card"],
+      smokingPolicy: "Запрещено"
+    },
+    additionalServices: {
+      cleaning: "Да, бесплатно",
+      bedding: "Да, бесплатно",
+      shuttle: true,
+      reports: true
+    },
+    lastModified: "20 марта 2026, 11:30",
+  },
+  {
+    ...MOCK_PROPERTY_DETAIL,
+    id: "173899",
+    title: "Глэмпинг 'Сибирский Лес'",
+    location: "Кировский р-н",
+    status: "pending",
+    propertyType: "Глэмпинг",
+    lastModified: "20 марта 2026, 11:45",
+  }
+];
+
+export const getPropertyById = (id: string): PropertyDetail | undefined => {
+  // First check specific dashboard listings (already has full details)
+  const dashboardItem = MOCK_DASHBOARD_LISTINGS.find(p => p.id === id);
+  if (dashboardItem) return dashboardItem;
+
+  // Then check general properties and merge with MOCK_PROPERTY_DETAIL as default template
+  const baseItem = MOCK_PROPERTIES.find(p => p.id === id);
+  if (baseItem) {
+    return {
+      ...MOCK_PROPERTY_DETAIL,
+      ...baseItem,
+      id: baseItem.id, // Ensure ID is preserved
+    };
+  }
+
+  // Handle 'detail' fallback
+  if (id === "detail") return MOCK_PROPERTY_DETAIL;
+
+  return undefined;
 };

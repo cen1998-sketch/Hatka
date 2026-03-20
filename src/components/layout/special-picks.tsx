@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const SPECIAL_PROPERTIES = [
-  { id: 1, title: "Томск, Савиных улица, 4А", price: "3 000", image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=300&q=80" },
-  { id: 2, title: "Томск, проспект Ленина, 121", price: "13 000", image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=300&q=80" },
-  { id: 3, title: "Томск, улица Кирова, 15", price: "13 000", image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=300&q=80" },
-  { id: 4, title: "Томск, Комсомольский пр-т", price: "13 000", image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=300&q=80" },
+  { id: "prop-0", title: "Томск, Савиных улица, 4А", price: "3 000", image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=300&q=80" },
+  { id: "prop-1", title: "Томск, проспект Ленина, 121", price: "13 000", image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=300&q=80" },
+  { id: "prop-2", title: "Томск, улица Кирова, 15", price: "13 000", image: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=300&q=80" },
+  { id: "prop-3", title: "Томск, Комсомольский пр-т", price: "13 000", image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=300&q=80" },
 ];
 
 export function SpecialPicks() {
@@ -38,11 +39,11 @@ export function SpecialPicks() {
         {/* Horizontal List of Cards */}
         <div className="self-stretch flex-1 inline-flex justify-start items-start gap-1 z-10 overflow-hidden">
           {SPECIAL_PROPERTIES.map((prop) => (
-            <div key={prop.id} className="flex-1 min-w-[150px] h-48 bg-white rounded-lg flex flex-col justify-start items-start overflow-hidden shadow-sm hover:scale-[1.02] transition-transform">
+            <Link key={prop.id} href={`/property/${prop.id}`} className="flex-1 min-w-[150px] h-48 bg-white rounded-lg flex flex-col justify-start items-start overflow-hidden shadow-sm hover:scale-[1.02] transition-transform">
               <div className="relative w-full h-32">
                 <Image src={prop.image} alt={prop.title} fill className="object-cover p-2 rounded-xl" />
               </div>
-              <div className="self-stretch px-2 py-1 flex flex-col justify-end items-start">
+              <div className="self-stretch px-2 py-1 flex flex-col justify-end items-start text-left">
                 <div className="self-stretch flex flex-col justify-start items-start gap-0.5">
                   <div className="self-stretch text-neutral-950 text-xs font-semibold leading-5 line-clamp-1">{prop.title}</div>
                 </div>
@@ -51,7 +52,7 @@ export function SpecialPicks() {
                   <div className="text-neutral-400 text-[10px] font-medium leading-4">за 1 сутки</div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
 
           {/* Promo Card Block */}

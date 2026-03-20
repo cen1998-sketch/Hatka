@@ -4,6 +4,7 @@ export interface Property extends PropertyCardProps {
   id: string;
   lat: number;
   lng: number;
+  basePrice?: number;
 }
 
 export interface HostInfo {
@@ -43,8 +44,8 @@ export interface SleepingPlace {
 
 export interface PropertyDetail extends Property {
   images: string[];
-  description: string;
   tags: string[];
+  description: string;
   host: HostInfo;
   sleepingPlaces: {
     summary: string;
@@ -68,11 +69,37 @@ export interface PropertyDetail extends Property {
     count: number;
     items: Review[];
   };
-  price: string;
-  basePrice: number;
   cancelationPolicy: {
     title: string;
     deadline: string;
     description: string;
+  };
+  
+  // Dashboard & Database fields
+  status?: "active" | "pending" | "draft";
+  lastModified?: string;
+  propertyType?: string; // e.g., "Гостиница", "Отель"
+  addressDetails?: {
+    streetType: string;
+    streetName: string;
+    house: string;
+    building?: string;
+    city: string;
+  };
+  registryNumber?: string;
+  stars?: number;
+  infrastructure?: {
+    internet: "Paid" | "Free" | "No";
+    parking: "Paid" | "Free" | "No";
+    yearBuilt?: number;
+    roomCount?: number;
+    paymentMethods?: string[]; // ["Cash", "Card"]
+    smokingPolicy?: string;
+  };
+  additionalServices?: {
+    cleaning?: string;
+    bedding?: string;
+    shuttle?: boolean;
+    reports?: boolean;
   };
 }

@@ -1,4 +1,4 @@
-import { MOCK_PROPERTY_DETAIL } from "@/lib/mock-data";
+import { getPropertyById } from "@/lib/mock-data";
 import { PropertyGallery } from "@/components/property/property-gallery";
 import { PropertyHeader } from "@/components/property/property-header";
 import { PropertyDescription } from "@/components/property/property-description";
@@ -9,29 +9,53 @@ import { ReviewsSection } from "@/components/property/reviews-section";
 import { BookingCard } from "@/components/property/booking-card";
 import { HostCard } from "@/components/property/host-card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Search } from "lucide-react";
+import { ChevronLeft, Search, Info } from "lucide-react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
-export default function PropertyPage({ params }: { params: { id: string } }) {
-  // Use mock data for now, ignoring params.id
-  const property = MOCK_PROPERTY_DETAIL;
+import { HotelInfo } from "@/components/property/hotel-info";
+
+export default async function PropertyPage({ 
+  params,
+  searchParams
+}: { 
+  params: Promise<{ id: string }>,
+  searchParams: Promise<{ preview?: string }>
+}) {
+  const { id } = await params;
+  const { preview } = await searchParams;
+  const property = getPropertyById(id);
+
+  if (!property) {
+    notFound();
+  }
+
+  const isPreview = preview === "true";
 
   return (
     <div className="flex flex-col flex-1 w-full bg-neutral-100 min-h-screen">
+      {isPreview && (
+        <div className="sticky top-0 z-50 w-full bg-blue-600 text-white py-2.5 px-4 text-center shadow-lg backdrop-blur-sm bg-blue-600/90">
+          <div className="flex items-center justify-center gap-2">
+            <Info className="w-4 h-4" />
+            <p className="text-sm font-bold uppercase tracking-wide italic">Это предпросмотр вашего объявления</p>
+          </div>
+        </div>
+      )}
       <div className="w-full max-w-[1140px] mx-auto pt-6 pb-20 px-4 xl:px-0">
         
         {/* Navigation Bar */}
         <div className="flex justify-start items-center gap-3 mb-3">
+          <Link href="/dashboard">
+            <Button variant="outline" className="h-11 px-3.5 bg-background rounded-2xl flex items-center gap-1.5 border-none shadow-sm hover:bg-gray-50">
+              <ChevronLeft className="w-4 h-4" />
+              <span className="text-sm font-medium">Вернуться в кабинет</span>
+            </Button>
+          </Link>
           <Link href="/search">
             <Button variant="outline" className="h-11 px-3.5 bg-background rounded-2xl flex items-center gap-1.5 border-none shadow-sm hover:bg-gray-50">
               <ChevronLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Все варианты</span>
-            </Button>
-          </Link>
-          <Link href="/">
-            <Button variant="outline" className="h-11 px-3.5 bg-background rounded-2xl flex items-center gap-1.5 border-none shadow-sm hover:bg-gray-50">
-              <Search className="w-4 h-4" />
-              <span className="text-sm font-medium">Новый поиск</span>
             </Button>
           </Link>
         </div>
@@ -46,6 +70,10 @@ export default function PropertyPage({ params }: { params: { id: string } }) {
                 title={property.title} 
                 tags={property.tags}
               />
+
+              {property.propertyType === "Гостиница" && (
+                <HotelInfo property={property} />
+              )}
               
               <PropertyDescription text={property.description} />
               

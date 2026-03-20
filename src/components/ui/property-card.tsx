@@ -2,10 +2,12 @@
 
 import * as React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Heart, Star, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface PropertyCardProps {
+  id?: string;
   image: string;
   title: string;
   price: string;
@@ -21,6 +23,7 @@ export interface PropertyCardProps {
 }
 
 export function PropertyCard({
+  id,
   image,
   title,
   price,
@@ -32,10 +35,11 @@ export function PropertyCard({
 }: PropertyCardProps) {
   const [isFavorite, setIsFavorite] = React.useState(false);
 
-  return (
+  const cardContent = (
     <div
       className={cn(
         "relative rounded-xl overflow-hidden group w-full aspect-[4/3]",
+        id && "cursor-pointer",
         className
       )}
     >
@@ -53,6 +57,7 @@ export function PropertyCard({
       {/* Heart icon */}
       <button
         onClick={(e) => {
+          e.preventDefault();
           e.stopPropagation();
           setIsFavorite(!isFavorite);
         }}
@@ -120,6 +125,12 @@ export function PropertyCard({
       </div>
     </div>
   );
+
+  if (id) {
+    return <Link href={`/property/${id}`}>{cardContent}</Link>;
+  }
+
+  return cardContent;
 }
 
 PropertyCard.displayName = "PropertyCard";
