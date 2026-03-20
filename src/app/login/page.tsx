@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { Tabs } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { loginUser } from "@/lib/mock-data";
+import { signIn } from "next-auth/react";
 import { UserRole } from "@/lib/types";
 
 const STEPS = [
@@ -38,10 +38,13 @@ export default function LoginPage() {
 
     setIsLoading(true);
     try {
-      const result = await loginUser(email, role);
-      if (result.success) {
-        setIsSent(true);
-      }
+      // Use Auth.js signIn with nodemailer provider
+      await signIn("nodemailer", { 
+        email, 
+        callbackUrl: "/",
+        redirect: false, // We handle the success state manually in the UI
+      });
+      setIsSent(true);
     } catch (error) {
       console.error("Login error:", error);
     } finally {

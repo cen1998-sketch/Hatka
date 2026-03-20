@@ -18,7 +18,8 @@ const PropertyMap = dynamic(() => import("@/components/search/property-map"), {
 import { SidebarFilters } from "@/components/layout/sidebar-filters";
 
 export default function SearchPage() {
-  const [properties] = useState(MOCK_PROPERTIES);
+  // Avoid React hydration mismatch by not directly applying Math.random() on render
+  const properties = [...MOCK_PROPERTIES]; 
   const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
   const [isMapExpanded, setIsMapExpanded] = useState(false);
 

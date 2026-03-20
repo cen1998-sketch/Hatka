@@ -48,9 +48,9 @@ const streets = ["пр-т Ленина", "ул. Савиных", "ул. Киро
 
 export const MOCK_PROPERTIES: Property[] = Array.from({ length: 50 }).map((_, i) => {
   const street = streets[i % streets.length];
-  const house = Math.floor(Math.random() * 150) + 1;
-  const price = (Math.floor(Math.random() * 80) + 20) * 100; // 2000 - 10000
-  const rating = (Math.random() * 1 + 9).toFixed(1); // 9.0 - 10.0
+  const house = (i * 37) % 150 + 1;
+  const price = ((i * 17) % 80 + 20) * 100; // 2000 - 10000
+  const rating = (((i * 13) % 10) / 10 + 9).toFixed(1); // 9.0 - 10.0
   
   return {
     id: `prop-${i}`,
@@ -58,16 +58,16 @@ export const MOCK_PROPERTIES: Property[] = Array.from({ length: 50 }).map((_, i)
     title: `Томск, ${street}, ${house}А`,
     price: price.toLocaleString("ru-RU"),
     rating,
-    reviews: (Math.floor(Math.random() * 200) + 10).toString(),
+    reviews: ((i * 23) % 200 + 10).toString(),
     location: locations[i % locations.length],
     specs: {
-      guests: `${Math.floor(Math.random() * 4) + 1} гостя`,
-      beds: `${Math.floor(Math.random() * 2) + 1} кровать`,
-      area: `${Math.floor(Math.random() * 40) + 18}м2`,
+      guests: `${(i % 4) + 1} гостя`,
+      beds: `${(i % 2) + 1} кровать`,
+      area: `${((i * 7) % 40) + 18}м2`,
     },
-    // Random coordinates around Tomsk center
-    lat: 56.45 + (Math.random() * 0.1 - 0.05),
-    lng: 84.95 + (Math.random() * 0.1 - 0.05),
+    // Deterministic pseudo-random coordinates around Tomsk center
+    lat: 56.45 + (((i * 11) % 100) / 1000 - 0.05),
+    lng: 84.95 + (((i * 19) % 100) / 1000 - 0.05),
   };
 });
 
