@@ -20,7 +20,7 @@ export function SearchBar() {
   });
 
   return (
-    <div className="w-full h-auto md:h-24 p-4 md:p-6 bg-gray-200 rounded-xl flex items-center justify-center mb-10 overflow-hidden">
+    <div className="w-full h-auto md:h-24 p-4 md:p-6 bg-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
       <div className="w-full max-w-[1140px] flex flex-col md:flex-row items-center gap-1">
         {/* Город или адрес */}
         <SearchInput

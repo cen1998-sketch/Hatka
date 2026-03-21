@@ -38,10 +38,11 @@ export default function LoginPage() {
 
     setIsLoading(true);
     try {
-      // Use Auth.js signIn with nodemailer provider
+      // Указываем callbackUrl с параметром role, 
+      // чтобы ссылка сохранила выбор даже если пользователь откроет почту на телефоне
       await signIn("nodemailer", { 
         email, 
-        callbackUrl: "/",
+        callbackUrl: `/?role=${role}`,
         redirect: false, // We handle the success state manually in the UI
       });
       setIsSent(true);
@@ -147,7 +148,7 @@ export default function LoginPage() {
                     role === "landlord" ? "text-neutral-950" : "text-neutral-400"
                   )}
                 >
-                  Арендадатель
+                  Арендодатель
                 </button>
                 {/* Active slider background */}
                 <div 

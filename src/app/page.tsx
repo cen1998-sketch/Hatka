@@ -3,6 +3,9 @@ import { TitleBar } from "@/components/layout/title-bar";
 import { HomeSidebarFilters } from "@/components/layout/home-sidebar";
 import { SpecialPicks } from "@/components/layout/special-picks";
 import { PropertyCard } from "@/components/ui/property-card";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
 const PROPERTIES = [
   {
@@ -67,7 +70,25 @@ const PROPERTIES = [
   },
 ];
 
-export default function Home() {
+export default async function Home(props: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }) {
+  // Перехватываем роль из параметров (после перехода по магической ссылке)
+  if (props.searchParams) {
+    const searchParams = await props.searchParams;
+    const role = searchParams?.role;
+    
+    if (typeof role === "string" && (role === "landlord" || role === "tenant")) {
+      const session = await auth();
+      if (session?.user?.id) {
+        await prisma.user.update({
+          where: { id: session.user.id },
+          data: { role: role }
+        });
+        // Очищаем URL от технического параметра, чтобы не мозолил глаза
+        redirect("/");
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col flex-1 w-full bg-neutral-100 min-h-screen">
       <div className="w-full max-w-[1140px] mx-auto pt-6 pb-20 px-4 xl:px-0">

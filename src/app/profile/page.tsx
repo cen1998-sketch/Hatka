@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { Mail, Phone, ShieldCheck, MapPin, User as UserIcon } from "lucide-react";
 import { LogoutButton } from "./logout-button";
 import { ProfileEditor } from "./profile-editor";
 

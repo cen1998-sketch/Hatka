@@ -8,6 +8,7 @@ import { MOCK_PROPERTIES } from "@/lib/mock-data";
 import { FilterBar } from "@/components/search/filter-bar";
 import { Maximize2, Minimize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useScrollDirection } from "@/hooks/use-scroll-direction";
 
 // Dynamically import Map component to avoid SSR issues with MapLibre
 const PropertyMap = dynamic(() => import("@/components/search/property-map"), {
@@ -22,19 +23,26 @@ export default function SearchPage() {
   const properties = [...MOCK_PROPERTIES]; 
   const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
   const [isMapExpanded, setIsMapExpanded] = useState(false);
+  const scrollDirection = useScrollDirection();
+
+  const searchBarTop = scrollDirection === "down" ? "top-0" : "top-[80px]";
+  const mapTop = scrollDirection === "down" ? "top-[120px]" : "top-[200px]";
+  const mapHeight = scrollDirection === "down" ? "h-[calc(100vh-140px)]" : "h-[calc(100vh-220px)]";
 
   return (
-    <div className="flex flex-col flex-1 w-full bg-neutral-100 pb-20 items-center overflow-x-hidden">
+    <div className="flex flex-col flex-1 w-full bg-neutral-100 pb-20 items-center">
       {/* Header & Search Area */}
-      <div className="w-full transition-all duration-700">
+      <div className={cn("w-full sticky z-30 bg-neutral-100 pt-2 transition-all duration-300", searchBarTop)}>
+        {/* Mask to safely hide cards passing under the transparent header when the search bar is sticky at top-[80px] */}
+        <div className="absolute left-0 right-0 bottom-full h-[120px] bg-neutral-100 pointer-events-none" />
         <SearchBar />
       </div>
 
       {/* Main Content: Sidebar + Grid + Map */}
-      <div className="w-full flex justify-start items-start gap-5">
+      <div className="w-full flex justify-start items-start gap-5 pt-10">
         
         {/* Sidebar Filters */}
-        <aside className="hidden lg:block w-72 flex-shrink-0 sticky top-28 h-[calc(100vh-140px)] overflow-y-auto no-scrollbar pb-10">
+        <aside className="hidden lg:block w-72 flex-shrink-0 z-10">
           <SidebarFilters variant="detailed" />
         </aside>
 
@@ -81,10 +89,11 @@ export default function SearchPage() {
 
         {/* Map Area */}
         <div className={cn(
-          "transition-all duration-700 cubic-bezier(0.16, 1, 0.3, 1) z-10 sticky top-24",
+          "transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1) z-10 sticky",
+          mapTop, mapHeight,
           isMapExpanded 
-            ? "flex-1 lg:max-w-none h-[calc(100vh-120px)]" 
-            : "hidden xl:block w-[45%] h-[calc(100vh-120px)] max-h-[885px]"
+            ? "flex-1 lg:max-w-none" 
+            : "hidden xl:block w-[45%]"
         )}>
           <div className="w-full h-full relative rounded-xl overflow-hidden shadow-sm border border-gray-100 group">
             <PropertyMap 

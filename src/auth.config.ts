@@ -34,7 +34,7 @@ const getSmtpAccounts = () => {
 };
 
 export const authConfig = {
-  secret: process.env.AUTH_SECRET || "85ebf4b51a02796e9526ab1d79860431_fallback_secret_for_jwt",
+  secret: process.env.AUTH_SECRET!,
   providers: [
     Nodemailer({
       server: {

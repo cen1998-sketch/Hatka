@@ -1,11 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
 
 export function LogoutButton() {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    if (isOpen) window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   return (
     <>
@@ -18,8 +26,14 @@ export function LogoutButton() {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white max-w-sm w-full rounded-3xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setIsOpen(false)}
+        >
+          <div 
+            className="bg-white max-w-sm w-full rounded-3xl p-6 shadow-2xl flex flex-col gap-4 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h2 className="text-xl font-bold text-gray-900">Выход из аккаунта</h2>
             <p className="text-gray-500 text-sm leading-relaxed">
               Вы уверены, что хотите выйти из профиля? Вам придется снова запрашивать ссылку для входа, чтобы вернуться.

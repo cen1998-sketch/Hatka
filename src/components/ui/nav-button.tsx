@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface NavButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: React.ReactNode;
-  label: string;
+  label: React.ReactNode;
   isActive?: boolean;
   href?: string;
 }
