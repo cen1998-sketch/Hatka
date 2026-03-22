@@ -1,0 +1,217 @@
+.specialPicks {
+  width: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.banner {
+  width: 100%;
+  height: 16rem; /* 64 equivalent */
+  padding: 0.75rem;
+  position: relative;
+  background-color: #14b8a6; /* teal-500 */
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.bannerBg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+}
+
+.bannerBg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bannerHeader {
+  align-self: stretch;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.bannerTitleWrapper {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bannerTitle {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+
+.bannerSubtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+
+.allButton {
+  height: 2rem;
+  padding: 0.25rem 1rem;
+  background-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  border-radius: 0.75rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.allButton:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.list {
+  align-self: stretch;
+  flex: 1;
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.25rem;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.card {
+  flex: 1;
+  min-width: 150px;
+  height: 12rem; /* 48 equivalent */
+  background-color: white;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+  text-decoration: none;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+.cardImageWrapper {
+  position: relative;
+  width: 100%;
+  height: 8rem; /* 32 equivalent */
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+}
+
+.cardContent {
+  align-self: stretch;
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.cardTitle {
+  align-self: stretch;
+  color: #0a0a0a;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardPriceRow {
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cardPrice {
+  color: #0a0a0a;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+}
+
+.cardPricePeriod {
+  color: #a3a3a3;
+  font-size: 0.625rem;
+  font-weight: 500;
+  line-height: 1rem;
+}
+
+.promoCard {
+  width: 10rem; /* 40 equivalent */
+  height: 12rem;
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #f97316; /* orange-500 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  flex-shrink: 0;
+}
+
+.promoTitle {
+  width: 100%;
+  text-align: center;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1rem;
+  margin-top: 0.25rem;
+}
+
+.promoText {
+  text-align: center;
+  color: white;
+  font-size: 0.5625rem; /* 9px */
+  font-weight: 500;
+  line-height: 0.625rem;
+  padding: 0 0.25rem;
+}
+
+.promoImageWrapper {
+  width: 100%;
+  height: 4rem; /* 16 equivalent */
+  position: relative;
+}
+
+.promoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

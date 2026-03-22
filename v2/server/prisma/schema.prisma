@@ -1,0 +1,178 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [btree_gist]
+}
+
+enum TransactionType {
+  RENT
+  SALE
+}
+
+enum PropertyStatus {
+  DRAFT      // Черновик
+  PENDING    // На модерации
+  ACTIVE     // Опубликовано
+  REJECTED   // Отклонено
+  SOLD
+  ARCHIVED
+}
+
+enum BookingStatus {
+  PENDING    // Ожидает оплаты/подтверждения
+  CONFIRMED  // Оплачено (Занято)
+  CANCELLED  // Отменено
+  COMPLETED  // Завершено
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  lastName  String?
+  phone     String?
+  city      String?
+  role      String    @default("tenant") // tenant, landlord, moderator, admin
+  image     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  properties Property[]
+  bookings   Booking[]
+}
+
+model Property {
+  id              String         @id @default(uuid())
+  title           String         @db.VarChar(255)
+  description     String?        @db.Text
+  
+  pricePerNight   Decimal        @db.Decimal(12, 2)
+  pricePer15Days  Decimal?       @db.Decimal(12, 2)
+  transactionType TransactionType @default(RENT)
+  
+  // Физические характеристики
+  rooms           Int            @default(1)
+  bedrooms        Int            @default(1)
+  beds            Int            @default(1)
+  doubleBeds      Int            @default(0)
+  maxGuests       Int            @default(2) 
+  area            Float?         
+  floor           Int?
+  totalFloors     Int?
+  
+  // Локация
+  address         String
+  city            String?        @db.VarChar(100)
+  landmarks       String?        @db.Text // Ориентиры
+  
+  // Правила и Сведения
+  checkIn         String?        @default("14:00")
+  checkOut        String?        @default("12:00")
+  smoking         String?        // Можно, нельзя, в спец. местах
+  animals         String?        // Можно, нельзя, по запросу
+  children        Boolean        @default(true)
+  
+  // Удобства (быстрые флаги)
+  wifi            String?        // Бесплатно, платно, нет
+  parking         String?        // Бесплатно, платно, нет
+  
+  // Оплата
+  paymentMethods  String[]       @default([]) // ["cash", "card", etc]
+  deposit         Decimal?       @db.Decimal(12, 2)
+
+  // Флаги быстрого поиска
+  instantBooking  Boolean        @default(false)
+  contactless     Boolean        @default(false)
+  noDeposit       Boolean        @default(false)
+  
+  // Рейтинг
+  avgRating       Float          @default(4.5)
+  reviewsCount    Int            @default(0)
+
+  // Системные поля
+  status          PropertyStatus @default(PENDING) // По умолчанию на модерации
+  moderationComment String?      @db.Text // Причина отклонения
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Связи
+  categoryId      String?
+  category        Category?      @relation(fields: [categoryId], references: [id])
+  images          PropertyImage[]
+  bookings        Booking[]      
+  
+  // Оптимизация для фильтров
+  amenityIds      String[]       
+
+  amenitiesRelation PropertyAmenity[] 
+
+  ownerId         String?
+  owner           User?          @relation(fields: [ownerId], references: [id])
+
+  @@index([status, city, categoryId]) 
+  @@index([pricePerNight])            
+  @@index([rooms, area])              
+  @@index([amenityIds], type: Gin)
+  @@index([avgRating(sort: Desc), reviewsCount(sort: Desc)])
+}
+
+model Booking {
+  id           String        @id @default(uuid())
+  propertyId   String
+  property     Property      @relation(fields: [propertyId], references: [id])
+  
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  
+  checkInDate  DateTime      @db.Date 
+  checkOutDate DateTime      @db.Date
+  
+  guestsCount  Int
+  totalPrice   Decimal       @db.Decimal(12, 2)
+  status       BookingStatus @default(PENDING)
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // 🔥 HIGHLOAD ИНДЕКС для поиска свободных квартир
+  @@index([propertyId, status, checkInDate, checkOutDate])
+}
+
+model Category {
+  id         String     @id @default(uuid())
+  name       String     @unique
+  slug       String     @unique
+  properties Property[]
+}
+
+model PropertyImage {
+  id         String   @id @default(uuid())
+  url        String
+  isPrimary  Boolean  @default(false)
+  order      Int      @default(0)
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  
+  @@index([propertyId, isPrimary])
+}
+
+model Amenity {
+  id         String            @id @default(uuid())
+  name       String            @unique
+  groupId    String            
+  properties PropertyAmenity[]
+}
+
+model PropertyAmenity {
+  propertyId String
+  amenityId  String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  amenity    Amenity  @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+  
+  @@id([propertyId, amenityId])
+}

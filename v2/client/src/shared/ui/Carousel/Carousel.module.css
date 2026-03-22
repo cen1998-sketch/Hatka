@@ -1,0 +1,67 @@
+.carousel {
+  position: relative;
+}
+
+.content {
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+}
+
+.horizontal .container {
+  margin-left: -1rem;
+}
+
+.vertical .container {
+  margin-top: -1rem;
+  flex-direction: column;
+}
+
+.item {
+  min-width: 0;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: 100%;
+}
+
+.horizontal .item {
+  padding-left: 1rem;
+}
+
+.vertical .item {
+  padding-top: 1rem;
+}
+
+.button {
+  position: absolute;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 9999px;
+  z-index: 10;
+}
+
+.horizontal .previous {
+  left: -3rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.horizontal .next {
+  right: -3rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.vertical .previous {
+  top: -3rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(90deg);
+}
+
+.vertical .next {
+  bottom: -3rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(90deg);
+}

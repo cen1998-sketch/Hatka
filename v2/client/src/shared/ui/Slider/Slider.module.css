@@ -1,0 +1,49 @@
+.root {
+  position: relative;
+  display: flex;
+  width: 100%;
+  touch-action: none;
+  user-select: none;
+  align-items: center;
+}
+
+.track {
+  position: relative;
+  height: 0.375rem;
+  width: 100%;
+  flex-grow: 1;
+  overflow: hidden;
+  border-radius: 9999px;
+  background-color: #E5E5E5;
+}
+
+.range {
+  position: absolute;
+  height: 100%;
+  background-color: var(--primary);
+}
+
+.thumb {
+  display: block;
+  height: 1.25rem;
+  width: 1.25rem;
+  border-radius: 9999px;
+  border: 2px solid var(--primary);
+  background-color: white;
+  transition: transform 0.2s;
+  cursor: grab;
+}
+
+.thumb:hover {
+  transform: scale(1.1);
+}
+
+.thumb:active {
+  transform: scale(0.95);
+  cursor: grabbing;
+}
+
+.thumb:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary);
+}

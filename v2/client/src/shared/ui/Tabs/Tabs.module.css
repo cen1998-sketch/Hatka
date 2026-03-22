@@ -1,0 +1,41 @@
+.tabsContainer {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 0.375rem; /* p-1.5 */
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  border: 1px solid rgba(243, 244, 246, 0.5); /* gray-100/50 */
+}
+
+.tabBtn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease-out;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.tabBtn:focus-visible {
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3); /* primary/30 */
+}
+
+.tabBtnActive {
+  background-color: #F5F5F5;
+  color: #0a0a0a;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.tabBtnInactive {
+  background-color: transparent;
+  color: #737373; /* muted-foreground */
+}
+
+.tabBtnInactive:hover {
+  color: #0a0a0a;
+  background-color: rgba(249, 250, 251, 0.5); /* gray-50/50 */
+}

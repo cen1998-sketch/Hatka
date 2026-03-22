@@ -1,0 +1,158 @@
+.searchPage {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-bottom: 5rem;
+}
+
+.headerSticky {
+  position: sticky;
+  top: 80px; /* Below the main header */
+  z-index: 50;
+  background-color: #f5f5f5;
+  padding: 0.5rem 0;
+  transition: all 0.3s ease;
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.contentWrapper {
+  display: flex;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+  align-items: flex-start;
+}
+
+.sidebar {
+  width: 18rem; /* 288px */
+  flex-shrink: 0;
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .sidebar {
+    display: block;
+  }
+}
+
+.resultsArea {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.toolbar {
+  height: 2.75rem;
+  padding: 2px;
+  background-color: white;
+  border-radius: 1rem;
+  display: flex;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.toolBtn {
+  flex: 1;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: #404040;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toolBtn:hover {
+  background-color: #f9fafb;
+}
+
+.toolBtn.active {
+  background-color: #e5e5e5;
+  color: #0a0a0a;
+}
+
+.resultsInfo {
+  color: #0a0a0a;
+  font-size: 1rem;
+  font-weight: 400;
+  padding-left: 0.25rem;
+}
+
+.listingGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .listingGrid:not(.singleCol) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1536px) {
+  .listingGrid:not(.singleCol) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.cardWrapper {
+  width: 100%;
+}
+
+.mapArea {
+  width: 40%;
+  flex-shrink: 0;
+  display: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 1280px) {
+  .mapArea {
+    display: block;
+  }
+  .mapArea.expanded {
+    width: 60%;
+  }
+}
+
+.stickyMap {
+  position: sticky;
+  top: 160px; /* Header + SearchBar offset */
+  height: calc(100vh - 180px);
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+
+.mapToggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 30;
+  height: 2.75rem;
+  padding: 0 1rem;
+  background-color: white;
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #0a0a0a;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mapToggle:hover {
+  background-color: #f9fafb;
+  transform: translateY(-1px);
+}
+
+.mapToggle:active {
+  transform: translateY(0);
+}

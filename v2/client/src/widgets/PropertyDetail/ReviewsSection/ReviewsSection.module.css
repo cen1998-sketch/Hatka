@@ -1,0 +1,202 @@
+.container {
+  flex: 1;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  color: #0a0a0a;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+  margin: 0;
+}
+
+.scoreWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rating {
+  height: 1.5rem;
+  padding: 0 0.625rem;
+  background-color: rgba(245, 158, 11, 0.3); /* amber-500/30 */
+  border-radius: 0.625rem 0.125rem 0.625rem 0.125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ratingValue {
+  color: #f59e0b; /* amber-500 */
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.count {
+  height: 1.5rem;
+  padding: 0 0.625rem;
+  background-color: #e5e7eb; /* gray-200 */
+  border-radius: 0.125rem 0.625rem 0.125rem 0.625rem;
+  display: flex;
+  align-items: center;
+}
+
+.countValue {
+  color: #0a0a0a;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.reviewsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.reviewItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.reviewItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.authorInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.avatar {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f87171; /* red-400 fallback */
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.authorText {
+  display: flex;
+  flex-direction: column;
+}
+
+.authorName {
+  color: #0a0a0a;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.stayInfo {
+  color: #737373;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.timeAgo {
+  color: #737373;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.feedbackGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .feedbackGrid {
+    flex-direction: row;
+  }
+}
+
+.feedbackCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.feedbackTitle {
+  color: #0a0a0a;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.feedbackText {
+  color: #0a0a0a;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1rem;
+  margin: 0;
+}
+
+.hostReply {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(249, 115, 22, 0.2); /* orange-500/20 */
+}
+
+.replyBtn {
+  color: #737373;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.replyBtn:hover {
+  text-decoration: underline;
+}
+
+.showAllBtn {
+  height: 2.75rem;
+  padding: 0 1.5rem;
+  background-color: #0a0a0a;
+  color: white;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.showAllBtn:hover {
+  background-color: #262626;
+}

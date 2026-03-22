@@ -1,0 +1,61 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  transition: transform 0.3s duration-300;
+  margin-top: 0.5rem;
+}
+
+.isHidden {
+  transform: translateY(-100%);
+}
+
+.isVisible {
+  transform: translateY(0);
+}
+
+.container {
+  width: 100%;
+  max-width: 1140px;
+  padding: 0.625rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+.navSection {
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+@media (min-width: 1024px) {
+  .navSection {
+    display: flex;
+  }
+}
+
+.favoritesBadge {
+  position: absolute;
+  top: -0.375rem;
+  right: -0.375rem;
+  display: flex;
+  height: 0.875rem;
+  width: 0.875rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: #ef4444;
+  font-size: 9px;
+  font-weight: 700;
+  color: white;
+}

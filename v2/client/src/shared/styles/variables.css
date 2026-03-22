@@ -1,0 +1,30 @@
+:root {
+  --background: #F5F5F5;
+  --foreground: #0A0A0A;
+  --primary: #FF7A00;
+  --primary-foreground: #FFFFFF;
+  --secondary: #01A187;
+  --secondary-foreground: #FFFFFF;
+  --muted: #737373;
+  --muted-foreground: #737373;
+  --card: #FFFFFF;
+  --card-foreground: #0A0A0A;
+  --border: #E5E5E5;
+  --radius: 12px;
+  
+  /* Glassmorphism primitives */
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-blur: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0A0A0A;
+    --foreground: #FAFAFA;
+    --card: #171717;
+    --card-foreground: #FAFAFA;
+    --glass-bg: rgba(0, 0, 0, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.1);
+  }
+}
