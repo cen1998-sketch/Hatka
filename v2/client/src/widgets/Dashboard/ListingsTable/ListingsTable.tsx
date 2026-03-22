@@ -20,7 +20,7 @@ export function ListingRow({ listing }: { listing: PropertyDetail }) {
         <div className={s.thumbBox}>
           {listing.images && listing.images.length > 0 ? (
             <img 
-              src={listing.images[0]} 
+              src={typeof listing.images[0] === 'string' ? listing.images[0] : listing.images[0].url} 
               alt={listing.title}
               className={s.thumbImg}
             />
@@ -33,7 +33,7 @@ export function ListingRow({ listing }: { listing: PropertyDetail }) {
         </div>
         <div className={s.infoTextBox}>
           <Link 
-            to={listing.status === "active" ? `/property/${listing.id}?preview=true` : `/dashboard/create/hotel?id=${listing.id}`} 
+            to={listing.status === "ACTIVE" ? `/property/${listing.id}?preview=true` : `/dashboard/create/hotel/${listing.id}`} 
             className={s.infoTitle}
           >
             {listing.title}
@@ -46,12 +46,12 @@ export function ListingRow({ listing }: { listing: PropertyDetail }) {
         <div className={s.statusWrapper}>
           <div className={cn(
             s.statusDot,
-            listing.status === "active" ? s.statusDotActive : 
-            listing.status === "pending" ? s.statusDotPending : s.statusDotDraft
+            listing.status === "ACTIVE" ? s.statusDotActive : 
+            listing.status === "PENDING" ? s.statusDotPending : s.statusDotDraft
           )} />
           <span className={s.statusText}>
-            {listing.status === "active" ? "Опубликовано" : 
-             listing.status === "pending" ? "Ожидает размещения" : "Черновик"}
+            {listing.status === "ACTIVE" ? "Опубликовано" : 
+             listing.status === "PENDING" ? "На модерации" : "Черновик"}
           </span>
         </div>
       </div>

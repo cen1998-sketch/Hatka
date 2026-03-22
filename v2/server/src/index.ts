@@ -8,7 +8,15 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+app.use((req, res, next) => {
+  const size = req.get('content-length');
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - Body size: ${size} bytes`);
+  next();
+});
+console.log('--- Express Body Limit: 50mb ---');
 
 // Seed initial data if empty
 async function seed() {
@@ -151,81 +159,255 @@ app.get('/api/moderation/published', async (req, res) => {
   } catch (error) { res.status(500).json({ error: 'Failed to fetch published' }); }
 });
 
+app.get('/api/properties', async (req, res) => {
+  try {
+    const properties = await prisma.property.findMany({
+      include: { images: true, category: true }
+    });
+    res.json({ success: true, data: properties });
+  } catch (error) { res.status(500).json({ error: 'Failed to fetch properties' }); }
+});
+
+app.get('/api/properties/search', async (req, res) => {
+  try {
+    const { city, guests, minPrice, maxPrice, type } = req.query;
+    const properties = await prisma.property.findMany({
+      where: {
+        status: 'ACTIVE',
+        city: city ? String(city) : undefined,
+        maxGuests: guests ? { gte: Number(guests) } : undefined,
+        pricePerNight: {
+          gte: minPrice ? Number(minPrice) : undefined,
+          lte: maxPrice ? Number(maxPrice) : undefined
+        },
+        type: type ? (type as any) : undefined
+      },
+      include: { images: true, category: true }
+    });
+    res.json({ success: true, data: properties });
+  } catch (error) { res.status(500).json({ error: 'Search failed' }); }
+});
+
+app.get('/api/properties/:id', async (req, res) => {
+  try {
+    const property = await prisma.property.findUnique({
+      where: { id: req.params.id },
+      include: { images: true, category: true }
+    });
+    if (!property) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true, data: property });
+  } catch (error) { res.status(500).json({ error: 'Failed to fetch property' }); }
+});
+
+const mapFrontendDraftToPrisma = (data: any) => {
+  // 1. Mapping Property Type
+  let type: 'HOTEL_ROOM' | 'APARTMENT' | 'HOUSE' | 'PRIVATE_ROOM' = 'APARTMENT';
+  const subType = data.propertyType || data.subType || "";
+
+  if (['Отель', 'Гостиница', 'Хостел', 'Гостевой дом'].includes(subType) || data.type === 'HOTEL_ROOM') {
+    type = 'HOTEL_ROOM';
+  } else if (['Дом', 'Коттедж', 'Вилла'].includes(subType) || data.type === 'HOUSE') {
+    type = 'HOUSE';
+  } else if (['Комната'].includes(subType) || data.type === 'PRIVATE_ROOM') {
+    type = 'PRIVATE_ROOM';
+  }
+
+  // 2. Mapping Enums (UI Strings -> Prisma Enums)
+  const mapSmoking = (val: string): any => {
+    if (val === 'Можно' || val === 'ALLOWED') return 'ALLOWED';
+    if (val === 'В специально отведенных местах' || val === 'DESIGNATED_AREAS') return 'DESIGNATED_AREAS';
+    return 'FORBIDDEN';
+  };
+
+  const mapInternet = (val: string): any => {
+    if (val === 'Бесплатно' || val === 'FREE') return 'FREE';
+    if (val === 'Платно' || val === 'PAID') return 'PAID';
+    return 'NONE';
+  };
+
+  const mapParking = (val: string): any => {
+    if (val === 'Бесплатно' || val === 'FREE') return 'FREE';
+    if (val === 'Платно' || val === 'PAID') return 'PAID';
+    return 'NONE';
+  };
+
+  const mapPayment = (val: string): any => {
+    if (val === 'Любой' || val === 'ANY') return 'ANY';
+    if (val === 'Только наличные' || val === 'CASH_ONLY') return 'CASH_ONLY';
+    if (val === 'Только карта' || val === 'CARD_ONLY') return 'CARD_ONLY';
+    return 'CASH_AND_CARD';
+  };
+
+  const mapService = (val: string): any => {
+    if (val === 'Включено в стоимость' || val === 'INCLUDED_IN_PRICE') return 'INCLUDED_IN_PRICE';
+    if (val === 'Бесплатно по запросу' || val === 'AVAILABLE_FOR_FREE') return 'AVAILABLE_FOR_FREE';
+    if (val === 'Платно по запросу' || val === 'AVAILABLE_FOR_FEE') return 'AVAILABLE_FOR_FEE';
+    return 'NOT_AVAILABLE';
+  };
+
+  return {
+    type,
+    subType,
+    title: data.title || "Черновик",
+    registryNumber: data.registryNumber,
+    starRating: Number(data.starRating) || 0,
+    registryType: data.registryType,
+    buildYear: Number(data.buildYear) || null,
+    totalRooms: Number(data.totalRooms) || null,
+    city: data.city,
+    address: data.address || "Адрес не указан",
+    streetType: data.streetType,
+    streetName: data.streetName,
+    houseNumber: data.houseNumber,
+    buildingBlock: data.buildingBlock,
+    landmarks: data.landmarks,
+    description: data.description,
+    pricePerNight: data.pricePerNight ? Number(data.pricePerNight) : 0,
+    rooms: Number(data.rooms) || 1,
+    bedrooms: Number(data.bedrooms) || 1,
+    beds: Number(data.beds) || 1,
+    maxGuests: Number(data.maxGuests) || 2,
+    area: data.area ? Number(data.area) : null,
+    checkIn: data.checkIn || "14:00",
+    checkOut: data.checkOut || "12:00",
+    smoking: mapSmoking(data.smoking),
+    paymentMethod: data.paymentMethods && Array.isArray(data.paymentMethods) 
+      ? (data.paymentMethods.includes('card') ? 'CARD_ONLY' : 'CASH_ONLY')
+      : mapPayment(data.paymentMethod),
+    internet: mapInternet(data.wifi || data.internet), // handle both keys
+    parking: mapParking(data.parking),
+    isAllInclusive: !!data.isAllInclusive,
+    hasReportingDocs: !!data.hasReportingDocs,
+    hasTransfer: !!data.hasTransfer,
+    cleaningService: mapService(data.cleaningService),
+    bedLinen: mapService(data.bedLinen)
+  };
+};
+
+app.post('/api/properties/draft', async (req, res) => {
+  try {
+    const data = req.body;
+    const prismaData = mapFrontendDraftToPrisma(data);
+    let ownerId = data.ownerId;
+    
+    if (!ownerId) {
+      const firstUser = await prisma.user.findFirst();
+      ownerId = firstUser?.id || '';
+    }
+
+    const property = await prisma.property.upsert({
+      where: { id: data.id || 'new-draft-placeholder' },
+      update: {
+        ...prismaData,
+        status: "DRAFT"
+      },
+      create: {
+        ...prismaData,
+        ownerId: ownerId,
+        status: "DRAFT"
+      }
+    });
+    res.json({ success: true, data: property });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Failed to save draft', details: error.message });
+  }
+});
+
 app.post('/api/properties', async (req, res) => {
   try {
     const data = req.body;
+    const prismaData = mapFrontendDraftToPrisma(data);
+    let ownerId = data.ownerId;
+    
+    if (!ownerId) {
+      const firstUser = await prisma.user.findFirst();
+      ownerId = firstUser?.id || '';
+    }
+
     const property = await prisma.property.create({
       data: {
-        title: data.title,
-        description: data.description,
-        pricePerNight: data.pricePerNight || 0,
-        address: data.address || '',
-        city: data.city,
-        landmarks: data.landmarks,
-        rooms: data.rooms || 1,
-        beds: data.beds || 1,
-        maxGuests: data.maxGuests || 2,
-        area: data.area,
-        checkIn: data.checkIn,
-        checkOut: data.checkOut,
-        smoking: data.smoking,
-        animals: data.animals,
-        children: data.children !== undefined ? data.children : true,
-        wifi: data.wifi,
-        parking: data.parking,
-        paymentMethods: data.paymentMethods || [],
-        deposit: data.deposit || 0,
-        categoryId: data.categoryId,
-        ownerId: data.ownerId,
-        status: data.status || 'PENDING',
+        ...prismaData,
+        ownerId: ownerId,
+        status: data.status || "DRAFT",
         images: {
           create: data.images?.map((url: string) => ({ url })) || []
-        }
-      }
+        },
+        amenityIds: data.amenities || []
+      } as any
     });
-
-    res.json({ success: true, data: property });
+    res.status(201).json({ success: true, data: property });
   } catch (error: any) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to create property', details: error.message });
+    res.status(500).json({ 
+      error: 'Failed to create property', 
+      details: error.message,
+      stack: error.stack,
+      code: error.code 
+    });
   }
 });
 
 app.put('/api/properties/:id', async (req, res) => {
   try {
     const data = req.body;
+    const prismaData = mapFrontendDraftToPrisma(data);
+    
     const property = await prisma.property.update({
       where: { id: req.params.id },
       data: {
-        title: data.title,
-        description: data.description,
-        pricePerNight: data.pricePerNight,
-        address: data.address,
-        city: data.city,
-        landmarks: data.landmarks,
-        rooms: data.rooms,
-        beds: data.beds,
-        maxGuests: data.maxGuests,
-        area: data.area,
-        checkIn: data.checkIn,
-        checkOut: data.checkOut,
-        smoking: data.smoking,
-        animals: data.animals,
-        children: data.children,
-        wifi: data.wifi,
-        parking: data.parking,
-        paymentMethods: data.paymentMethods,
-        deposit: data.deposit,
+        ...prismaData,
         status: data.status,
+        amenityIds: data.amenities || [],
         images: data.images ? {
           deleteMany: {},
           create: data.images.map((url: string) => ({ url }))
         } : undefined
-      } as any // Use as any to bypass exactOptionalPropertyTypes if needed, or define proper type
+      } as any
     });
     res.json({ success: true, data: property });
   } catch (error: any) {
     res.status(500).json({ error: 'Failed to update property', details: error.message });
+  }
+});
+
+// Rooms Endpoints
+app.get('/api/properties/:id/rooms', async (req, res) => {
+  try {
+    const rooms = await prisma.room.findMany({
+      where: { propertyId: req.params.id },
+      include: { images: true }
+    });
+    res.json({ success: true, data: rooms });
+  } catch (error: any) {
+    res.status(500).json({ error: 'Failed to fetch rooms' });
+  }
+});
+
+app.post('/api/properties/:id/rooms', async (req, res) => {
+  try {
+    const data = req.body;
+    const room = await prisma.room.create({
+      data: {
+        propertyId: req.params.id,
+        title: data.title,
+        description: data.description,
+        price: data.price,
+        capacity: data.capacity,
+        beds: data.beds,
+        size: data.size,
+        amenityIds: data.amenityIds || [],
+        images: {
+          create: data.images?.map((url: string) => ({ url })) || []
+        }
+      }
+    });
+    res.json({ success: true, data: room });
+  } catch (error: any) {
+    res.status(500).json({ 
+      error: 'Failed to create room', 
+      details: error.message,
+      stack: error.stack,
+      code: error.code
+    });
   }
 });
 

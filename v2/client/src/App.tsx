@@ -9,10 +9,12 @@ import { PropertyDetail } from './pages/PropertyDetail/PropertyDetail.tsx';
 import { Dashboard } from './pages/Dashboard/Dashboard.tsx';
 import { Favorites } from './pages/Favorites/Favorites.tsx';
 import { CreateListing } from './pages/CreateListing/CreateListing.tsx';
-import { HotelCreation } from './pages/HotelCreation/HotelCreation.tsx';
+import { HotelCreation } from './pages/HotelCreation/HotelCreationV2.tsx';
+import { PropertyCreationPage } from './pages/PropertyCreationPage/ui/PropertyCreationPage.tsx';
 import { Checkout } from './pages/Checkout/Checkout.tsx';
 import { Search } from './pages/Search/Search.tsx';
 import { AuthCallback } from './pages/Login/AuthCallback.tsx';
+import { RoomCreation } from './pages/RoomCreation/RoomCreation.tsx';
 import { ModerationLogin } from './pages/Moderation/ModerationLogin.tsx';
 import { ModerationDashboard } from './pages/Moderation/ModerationDashboard.tsx';
 import './index.css';
@@ -43,6 +45,7 @@ function App() {
         <Routes>
           <Route element={<RootLayout />}>
             <Route path="/" element={<Home />} />
+            <Route path="/host/add" element={<PropertyCreationPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/property/:id" element={<PropertyDetail />} />
@@ -51,7 +54,8 @@ function App() {
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/create" element={<CreateListing />} />
-            <Route path="/dashboard/create/hotel" element={<HotelCreation />} />
+            <Route path="/dashboard/create/hotel/:id?" element={<HotelCreation />} />
+            <Route path="/dashboard/create/rooms/:propertyId" element={<RoomCreation />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/moderation/login" element={<ModerationLogin />} />
             <Route path="/moderation/dashboard" element={<ModerationDashboard />} />
