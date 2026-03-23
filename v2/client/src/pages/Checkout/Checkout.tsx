@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Link, useParams } from "react-router-dom";
-import { ChevronLeft, Clock, CreditCard, Smartphone, Globe, Link2, Calendar, Users, ChevronRight, Pen, LogIn, LogOut, Crosshair, Ban, FileText, Info } from "lucide-react";
-import { MOCK_PROPERTY_DETAIL } from "../../shared/api/mock-detail.ts";
+import { Link, useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { ChevronLeft, Clock, CreditCard, Smartphone, Globe, Link2, Calendar, Users, ChevronRight, Pen, LogIn, LogOut, Crosshair, Ban, FileText, Info, Loader2 } from "lucide-react";
+import { api } from "../../shared/api/api-base.ts";
 import { cn } from "../../shared/lib/clsx.ts";
 import s from "./Checkout.module.css";
 
@@ -14,14 +14,68 @@ const methods = [
 
 export function Checkout() {
   const { id } = useParams<{ id: string }>();
-  // Use mock for now
-  const property = MOCK_PROPERTY_DETAIL;
-  const bookingId = "39783375";
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  
+  const [property, setProperty] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
   const [selectedMethod, setSelectedMethod] = React.useState("sbp");
+  const [bookingLoading, setBookingLoading] = React.useState(false);
+
+  const checkIn = searchParams.get('checkIn');
+  const checkOut = searchParams.get('checkOut');
+  const guestsCount = Number(searchParams.get('guests')) || 2;
+
+  React.useEffect(() => {
+    const fetchProperty = async () => {
+      try {
+        const response = await api.get(`/properties/${id}`);
+        setProperty(response.data.data);
+      } catch (error) {
+        console.error("Failed to fetch property", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProperty();
+  }, [id]);
+
+  const handlePayment = async () => {
+    if (!checkIn || !checkOut) return;
+    setBookingLoading(true);
+    try {
+      const response = await api.post('/bookings', {
+        propertyId: id,
+        checkInDate: checkIn,
+        checkOutDate: checkOut,
+        guestsCount
+      });
+      if (response.data.success) {
+        alert("Бронирование успешно создано!");
+        navigate('/dashboard/bookings');
+      }
+    } catch (error: any) {
+      alert(error.response?.data?.error || "Ошибка при создании бронирования");
+    } finally {
+      setBookingLoading(false);
+    }
+  };
 
   const formatPrice = (p: number) => p.toLocaleString("ru-RU") + " ₽";
-  const totalPrice = 66560;
-  const prepayment = 13312;
+
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return "Выберите дату";
+    return new Date(dateStr).toLocaleDateString("ru-RU", { day: 'numeric', month: 'short' });
+  };
+  
+  if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin" /></div>;
+  if (!property) return <div className="p-20 text-center">Объект не найден</div>;
+
+  const start = new Date(checkIn || "");
+  const end = new Date(checkOut || "");
+  const nights = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) || 1;
+  const totalPrice = Number(property.pricePerNight) * nights;
+  const prepayment = Math.round(totalPrice * 0.2);
 
   return (
     <div className={s.wrapper}>
@@ -43,7 +97,7 @@ export function Checkout() {
             {/* Header */}
             <div className={s.headerRow}>
               <h1 className={s.headerTitle}>Подтвердить и оплатить</h1>
-              <span className={s.bookingId}>Номер бронирования: {bookingId}</span>
+              <span className={s.bookingId}>Номер бронирования: {id}</span> {/* Assuming id is bookingId for now */}
             </div>
             
             {/* Alert */}
@@ -107,7 +161,9 @@ export function Checkout() {
                     <div className={s.infoIconBox}><Calendar size={16} /></div>
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       <span className={s.infoLabel}>Даты заезда и отъезда</span>
-                      <span className={s.infoValue}>2 апр, чт - 26 апр, вс</span>
+                      <span className={s.infoValue}>
+                        {formatDate(checkIn)} - {formatDate(checkOut)}
+                      </span>
                     </div>
                   </div>
                   <ChevronRight size={16} className={s.infoChevron} />
@@ -118,7 +174,7 @@ export function Checkout() {
                       <div className={s.infoIconBox}><Users size={16} /></div>
                       <div style={{ display: "flex", flexDirection: "column" }}>
                         <span className={s.infoLabel}>Гости</span>
-                        <span className={s.infoValue}>2 взрослых, без детей и питомцев</span>
+                        <span className={s.infoValue}>{guestsCount} гостей</span>
                       </div>
                     </div>
                     <ChevronRight size={16} className={s.infoChevron} />
@@ -237,8 +293,12 @@ export function Checkout() {
           <aside className={s.sidebarColumn}>
             
             <div className={s.card}>
-              <button className={s.payButton}>
-                Оплатить {formatPrice(prepayment)}
+              <button 
+                className={s.payButton} 
+                onClick={handlePayment}
+                disabled={bookingLoading}
+              >
+                {bookingLoading ? <Loader2 className="animate-spin mx-auto" size={20} /> : `Оплатить ${formatPrice(prepayment)}`}
               </button>
               <p className={s.payAgree}>
                 Нажимая кнопку «Оплатить», вы соглашаетесь с правилами объекта размещения и бронирования
@@ -249,7 +309,7 @@ export function Checkout() {
               <h2 className={s.priceCalcHeader}>Расчёт стоимости</h2>
               
               <div className={s.priceRow}>
-                <span className={s.priceLabel}>Стоимость проживания за 24 суток</span>
+                <span className={s.priceLabel}>Стоимость проживания за {nights} сут.</span>
                 <span className={s.priceVal}>{formatPrice(totalPrice)}</span>
               </div>
 

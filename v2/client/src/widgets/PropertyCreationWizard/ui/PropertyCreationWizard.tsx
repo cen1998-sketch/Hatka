@@ -1,201 +1,96 @@
-import * as React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { ChevronLeft, ChevronRight, CheckCircle2, Loader2, Save, Clock, Ban, CreditCard } from "lucide-react";
-import { cn } from "../../../shared/lib/clsx";
-import { Button } from "../../../shared/ui/Button/Button";
-import { Input } from "../../../shared/ui/Input/Input";
-import { Label } from "../../../shared/ui/Label/Label";
-import {
-  selectPropertyDraft,
-  updateDraft,
-  setStep,
-  savePropertyDraft
-} from "../../../entities/property/model/property-slice";
-import { PropertyTypeSelect } from "../../../features/PropertyTypeSelect/ui/PropertyTypeSelect";
-import { PropertyLocationForm } from "../../../features/PropertyLocationForm/ui/PropertyLocationForm";
-import { PropertyBasicInfoForm } from "../../../features/PropertyBasicInfoForm/ui/PropertyBasicInfoForm";
-import { PropertyRulesForm } from "../../../features/PropertyRulesForm/ui/PropertyRulesForm";
-import { PropertyAmenitiesForm } from "../../../features/PropertyAmenitiesForm/ui/PropertyAmenitiesForm";
-import type { AppDispatch, RootState } from "../../../app/store";
-import type { PropertyType, SmokingPolicy, PaymentMethodType, InternetAvailability, ParkingAvailability, AdditionalServicePolicy, PropertyDraftState } from "../../../entities/property/model/types";
-
-const STEPS = [
-  "Тип жилья",
-  "Адрес",
-  "Данные объекта",
-  "Правила",
-  "Услуги",
-  "Описание"
-];
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectPropertyDraft, prevStep, resetDraft } from '../../../entities/property/model/draft-slice';
+import type { RootState } from '../../../app/store';
+import { Step1Essentials } from '../../../features/property-create/ui/Step1Essentials';
+import { Card } from '../../../shared/ui/Card/Card';
+import { X, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { Step2PropertyInfo } from '../../../features/property-create/ui/Step2PropertyInfo';
+import { Step3RoomManagement } from '../../../features/property-create/ui/Step3RoomManagement';
+import { Step4Finalize } from '../../../features/property-create/ui/Step4Finalize';
 
 export const PropertyCreationWizard: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const draft = useSelector((state: RootState) => selectPropertyDraft(state)) as PropertyDraftState;
-  const { currentStep, isSaving, lastSavedAt } = draft;
+  const draft = useSelector((state: RootState) => selectPropertyDraft(state));
+  const { currentStep, type } = draft;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleUpdate = (data: any) => {
-    dispatch(updateDraft(data));
-  };
-
-  const handleNext = () => {
-    if (currentStep < STEPS.length) {
-      dispatch(setStep(currentStep + 1));
-      window.scrollTo(0, 0);
-      // Auto-save on next
-      dispatch(savePropertyDraft(draft));
+  const handleClose = () => {
+    if (window.confirm('Вы уверены, что хотите выйти? Прогресс будет потерян.')) {
+      dispatch(resetDraft());
+      navigate('/dashboard');
     }
   };
 
-  const handleBack = () => {
-    if (currentStep > 1) {
-      dispatch(setStep(currentStep - 1));
-      window.scrollTo(0, 0);
-    }
-  };
+  const isHotel = type === 'HOTEL_ROOM';
 
+  // Step Mapping
+  // 1: Essentials
+  // 2: Info
+  // 3: Rooms (Hotel Only)
+  // 4: Finalize
+  
   const renderStep = () => {
     switch (currentStep) {
-      case 1:
-        return (
-          <PropertyTypeSelect 
-            type={draft.type || 'APARTMENT'} 
-            subType={draft.subType}
-            onChange={(data) => dispatch(updateDraft(data))} 
-          />
-        );
-      case 2:
-        return (
-          <PropertyLocationForm 
-            city={draft.city}
-            streetName={draft.streetName}
-            streetType={draft.streetType}
-            houseNumber={draft.houseNumber}
-            buildingBlock={draft.buildingBlock}
-            onChange={handleUpdate} 
-          />
-        );
-      case 3:
-        return (
-          <PropertyBasicInfoForm 
-            title={draft.title}
-            registryNumber={draft.registryNumber}
-            starRating={draft.starRating}
-            registryType={draft.registryType}
-            buildYear={draft.buildYear}
-            totalRooms={draft.totalRooms}
-            onChange={handleUpdate} 
-          />
-        );
-      case 4:
-        return (
-          <PropertyRulesForm 
-            checkIn={draft.checkIn}
-            checkOut={draft.checkOut}
-            smoking={draft.smoking}
-            paymentMethod={draft.paymentMethod}
-            onChange={handleUpdate} 
-          />
-        );
-      case 5:
-        return (
-          <PropertyAmenitiesForm 
-            internet={draft.internet}
-            parking={draft.parkingEnum}
-            isAllInclusive={draft.isAllInclusive}
-            cleaningService={draft.cleaningService}
-            bedLinen={draft.bedLinen}
-            hasReportingDocs={draft.hasReportingDocs}
-            hasTransfer={draft.hasTransfer}
-            onChange={handleUpdate} 
-          />
-        );
-      case 6:
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-black text-gray-900">Описание и финал</h2>
-              <p className="mt-2 text-gray-500">Добавьте подробное описание для будущих гостей.</p>
-            </div>
-            <textarea
-              className="min-h-[200px] w-full rounded-2xl border-2 border-gray-100 p-4 focus:border-blue-600 focus:outline-none"
-              placeholder="Расскажите о преимуществах вашего жилья, районе и правилах..."
-              value={draft.description || ""}
-              onChange={(e) => handleUpdate({ description: e.target.value })}
-            />
-          </div>
-        );
-      default:
-        return null;
+      case 1: return <Step1Essentials />;
+      case 2: return <Step2PropertyInfo />;
+      case 3: return isHotel ? <Step3RoomManagement /> : <Step4Finalize />;
+      case 4: return <Step4Finalize />;
+      default: return <Step1Essentials />;
     }
   };
 
+  const totalSteps = isHotel ? 4 : 3;
+  const displayStep = currentStep > 3 && !isHotel ? 3 : currentStep;
+  const progress = (displayStep / totalSteps) * 100;
+
   return (
-    <div className="mx-auto max-w-4xl space-y-8 px-4 py-12">
-      {/* Header & Progress */}
-      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-4 text-sm font-medium text-gray-400">
-          {STEPS.map((s, idx) => {
-            const stepNum = idx + 1;
-            const isCompleted = stepNum < currentStep;
-            const isActive = stepNum === currentStep;
-
-            return (
-              <React.Fragment key={s}>
-                {idx > 0 && <div className="h-px w-4 bg-gray-200" />}
-                <div className={cn(
-                  "flex items-center gap-2",
-                  isActive ? "text-blue-600" : isCompleted ? "text-green-600" : ""
-                )}>
-                  {isCompleted ? <CheckCircle2 size={16} /> : <span>{stepNum}</span>}
-                  <span className="hidden sm:inline">{s}</span>
-                </div>
-              </React.Fragment>
-            );
-          })}
-        </div>
-        
-        <div className="flex items-center gap-2 text-xs text-gray-400">
-          {isSaving ? (
-            <div className="flex items-center gap-1.5">
-              <Loader2 size={14} className="animate-spin" />
-              <span>Сохранение...</span>
+    <div className="min-h-screen bg-gray-50/50 py-12 px-4 selection:bg-[rgba(255,122,0,0.1)] selection:text-[var(--primary)]">
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Header */}
+        <header className="flex items-center justify-between animate-in fade-in duration-700">
+          <div className="flex items-center gap-6">
+            {currentStep > 1 && (
+              <button 
+                onClick={() => dispatch(prevStep())}
+                className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white border border-gray-100 text-gray-400 hover:text-[var(--primary)] hover:border-[var(--primary)] transition-all shadow-sm"
+              >
+                <ArrowLeft size={24} />
+              </button>
+            )}
+            <div>
+              <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+                Сдать жилье
+              </h1>
+              <p className="text-gray-500 font-medium">Создание нового объявления — Шаг {displayStep} из {totalSteps}</p>
             </div>
-          ) : lastSavedAt ? (
-            <div className="flex items-center gap-1.5">
-              <Save size={14} />
-              <span>Сохранено в {new Date(lastSavedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-            </div>
-          ) : (
-            <span>Черновик</span>
-          )}
+          </div>
+          <button 
+            onClick={handleClose}
+            className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white border border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 transition-all shadow-sm"
+          >
+            <X size={24} />
+          </button>
+        </header>
+
+        {/* Progress Bar */}
+        <div className="h-3 w-full bg-white rounded-full overflow-hidden border border-gray-100 shadow-inner">
+          <div 
+            className="h-full bg-[var(--primary)] transition-all duration-700 ease-out shadow-[0_0_15px_rgba(255,122,0,0.3)]"
+            style={{ width: `${progress}%` }}
+          />
         </div>
-      </div>
 
-      {/* Step Content */}
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-        {renderStep()}
-      </div>
-
-      {/* Navigation */}
-      <div className="flex items-center justify-between border-t border-gray-100 pt-8">
-        <Button
-          variant="ghost"
-          onClick={handleBack}
-          disabled={currentStep === 1 || isSaving}
-          className="gap-2 h-12"
-        >
-          <ChevronLeft size={20} />
-          Назад
-        </Button>
-        
-        <Button
-          onClick={handleNext}
-          disabled={isSaving}
-          className="gap-2 h-12 px-8 min-w-[140px]"
-        >
-          {currentStep === STEPS.length ? "Опубликовать" : "Продолжить"}
-          <ChevronRight size={20} />
-        </Button>
+        {/* Main Step Container */}
+        <Card className="p-8 md:p-12 rounded-[2.5rem] border-0 shadow-2xl shadow-gray-200/50 bg-white relative overflow-hidden min-h-[500px]">
+          {/* Subtle background glow */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[radial-gradient(circle_at_top_right,var(--primary-glow),transparent_70%)] opacity-20 pointer-events-none" />
+          
+          <div className="relative z-10">
+            {renderStep()}
+          </div>
+        </Card>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ChevronLeft, Plus, Trash2, Upload, Loader2, Bed, Maximize2, Users } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import imageCompression from "browser-image-compression";
+import { compressImage, fileToBase64 } from "../../shared/lib/image-utils.ts";
 import { Button } from "../../shared/ui/Button/Button.tsx";
 import { Input } from "../../shared/ui/Input/Input.tsx";
 import { Badge } from "../../shared/ui/Badge/Badge.tsx";
@@ -37,23 +37,11 @@ export function RoomCreation() {
     if (!files) return;
 
     setIsUploading(true);
-    const options = {
-      maxSizeMB: 0.2,
-      maxWidthOrHeight: 1200,
-      useWebWorker: true,
-    };
-
     try {
       const compressedFiles = await Promise.all(
         Array.from(files).map(async (file) => {
-          console.log(`Оригинал: ${file.name}, размер: ${(file.size / 1024 / 1024).toFixed(2)} MB`);
-          const compressed = await imageCompression(file, options);
-          console.log(`Сжато: ${file.name}, размер: ${(compressed.size / 1024 / 1024).toFixed(2)} MB`);
-          return new Promise<string>((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.readAsDataURL(compressed);
-          });
+          const compressed = await compressImage(file, 1200, 0.7);
+          return await fileToBase64(compressed);
         })
       );
       setImages(prev => [...prev, ...compressedFiles]);

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { cn } from "../../lib/clsx.ts";
+import { motion } from "framer-motion";
 
 interface RadioGroupCardProps {
   value: string;
@@ -20,50 +21,65 @@ export const RadioGroupCard: React.FC<RadioGroupCardProps> = ({
   className
 }) => {
   return (
-    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4", className)}>
+    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6", className)}>
       {options.map((option) => {
         const isActive = value === option.id;
         
         return (
-          <div
+          <motion.div
             key={option.id}
+            whileHover={{ y: -5, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => onChange(option.id)}
             className={cn(
-              "relative cursor-pointer rounded-2xl border-2 p-6 transition-all duration-200 hover:border-blue-200 hover:bg-blue-50/30",
+              "group relative cursor-pointer rounded-3xl border-2 p-8 transition-all duration-300",
               isActive 
-                ? "border-blue-600 bg-blue-50/50 ring-1 ring-blue-600" 
-                : "border-gray-100 bg-white"
+                ? "border-[var(--primary)] shadow-xl shadow-[rgba(255,122,0,0.1)]" 
+                : "border-gray-50 bg-white hover:border-[rgba(255,122,0,0.2)] hover:shadow-lg hover:shadow-gray-200/50"
             )}
           >
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-6">
               {option.icon && (
                 <div className={cn(
-                  "flex h-12 w-12 items-center justify-center rounded-xl transition-colors",
-                  isActive ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600"
-                )}>
-                  {option.icon}
+                  "flex h-16 w-16 items-center justify-center rounded-2xl transition-all duration-300 shadow-sm",
+                  isActive 
+                    ? "text-white" 
+                    : "bg-gray-50 text-gray-400 group-hover:text-[var(--primary)]"
+                )}
+                style={{
+                  backgroundColor: isActive ? 'var(--primary)' : undefined,
+                }}>
+                  {/* @ts-ignore */}
+                  {React.isValidElement(option.icon) ? React.cloneElement(option.icon as any, { size: 32 }) : option.icon}
                 </div>
               )}
-              <div>
+              <div className="space-y-2">
                 <h3 className={cn(
-                  "text-lg font-bold transition-colors",
-                  isActive ? "text-blue-900" : "text-gray-900"
+                  "text-xl font-black tracking-tight transition-colors",
+                  "text-gray-900"
                 )}>
                   {option.title}
                 </h3>
                 {option.description && (
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="text-sm font-medium leading-relaxed text-gray-500">
                     {option.description}
                   </p>
                 )}
               </div>
             </div>
             {isActive && (
-              <div className="absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600">
-                <div className="h-2 w-2 rounded-full bg-white" />
-              </div>
+              <motion.div 
+                layoutId="active-indicator"
+                className="absolute right-6 top-6 flex h-8 w-8 items-center justify-center rounded-full shadow-lg"
+                style={{ 
+                  backgroundColor: 'var(--primary)',
+                  boxShadow: '0 4px 12px rgba(255, 122, 0, 0.3)' 
+                }}
+              >
+                <div className="h-2.5 w-2.5 rounded-full bg-white" />
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         );
       })}
     </div>

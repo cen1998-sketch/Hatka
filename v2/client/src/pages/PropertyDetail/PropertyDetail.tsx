@@ -1,7 +1,8 @@
 import * as React from "react";
-import { ChevronLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { PropertyGallery } from "../../widgets/PropertyDetail/PropertyGallery/PropertyGallery.tsx";
+import { api } from "../../shared/api/api-base.ts";
 import { PropertyHeader } from "../../widgets/PropertyDetail/PropertyHeader/PropertyHeader.tsx";
 import { PropertyDescription } from "../../widgets/PropertyDetail/PropertyDescription/PropertyDescription.tsx";
 import { SleepingArrangements } from "../../widgets/PropertyDetail/SleepingArrangements/SleepingArrangements.tsx";
@@ -10,16 +11,32 @@ import { HouseRules } from "../../widgets/PropertyDetail/HouseRules/HouseRules.t
 import { ReviewsSection } from "../../widgets/PropertyDetail/ReviewsSection/ReviewsSection.tsx";
 import { BookingCard } from "../../widgets/PropertyDetail/BookingCard/BookingCard.tsx";
 import { HostCard } from "../../widgets/PropertyDetail/HostCard/HostCard.tsx";
+import { ReviewForm } from "../../features/ReviewForm/ui/ReviewForm.tsx";
 import { MOCK_PROPERTY_DETAIL } from "../../shared/api/mock-detail.ts";
 import s from "./PropertyDetail.module.css";
 
 export function PropertyDetail() {
-  // Имитация fetch(id)
-  const property = MOCK_PROPERTY_DETAIL;
+  const { id } = useParams<{ id: string }>();
+  const [property, setProperty] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
 
-  if (!property) {
-    return <div>Not Found</div>;
-  }
+  const fetchProperty = async () => {
+    try {
+      const response = await api.get(`/properties/${id}`);
+      setProperty(response.data.data);
+    } catch (error) {
+      console.error("Failed to fetch property", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchProperty();
+  }, [id]);
+
+  if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="animate-spin" /></div>;
+  if (!property) return <div className="p-20 text-center">Объект не найден</div>;
 
   return (
     <div className={s.wrapper}>
@@ -67,15 +84,22 @@ export function PropertyDetail() {
               
               <div className={s.reviewsRow}>
                 <ReviewsSection 
-                  rating={property.detailedReviews.rating}
-                  count={property.detailedReviews.count}
-                  items={property.detailedReviews.items}
+                  rating={property.avgRating || 5}
+                  count={property.reviewsCount || 0}
+                  items={property.reviews || []}
                 />
                 <HostCard host={property.host} />
               </div>
 
+              <ReviewForm 
+                propertyId={property.id} 
+                onSuccess={fetchProperty} 
+              />
+
               <div className={s.postedDate}>
-                <p className={s.postedDateText}>Размещен 15.02.2025</p>
+                <p className={s.postedDateText}>
+                  Размещен {new Date(property.createdAt).toLocaleDateString("ru-RU")}
+                </p>
               </div>
             </div>
           </div>

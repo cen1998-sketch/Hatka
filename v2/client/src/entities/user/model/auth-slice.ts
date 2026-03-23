@@ -1,66 +1,76 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { api } from '../../../shared/api/api-base.ts';
+import { setLegacyToken } from '../../../shared/api/api-base.ts';
 
-interface User {
+export interface User {
   id: string;
   email: string;
-  role: 'tenant' | 'landlord' | 'moderator' | 'admin';
-  name?: string;
+  role: 'GUEST' | 'HOST' | 'BOTH' | 'MODERATOR' | 'ADMIN' | 'tenant' | 'landlord'; // Added legacy roles for compatibility
+  firstName?: string;
+  lastName?: string;
+  name?: string; // Legacy field
+  phone?: string;
+  city?: string;
+  avatarUrl?: string;
 }
 
 interface AuthState {
   user: User | null;
-  token: string | null;
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  error: string | null;
+  accessToken: string | null;
+  isInitialized: boolean;
 }
 
 const initialState: AuthState = {
   user: JSON.parse(localStorage.getItem('user') || 'null'),
-  token: localStorage.getItem('token'),
-  status: 'idle',
-  error: null,
+  accessToken: null, // Access token is only in memory
+  isInitialized: false,
 };
-
-export const login = createAsyncThunk('auth/login', async ({ email, role }: { email: string, role: string }) => {
-  const response = await api.post('/auth/login', { email, role });
-  return response.data;
-});
-
-export const verifyToken = createAsyncThunk('auth/verify', async (token: string) => {
-  const response = await api.get(`/auth/verify?token=${token}`);
-  return response.data;
-});
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    setCredentials: (
+      state, 
+      action: PayloadAction<{ user?: User; accessToken: string }>
+    ) => {
+      const { user, accessToken } = action.payload;
+      if (user) {
+        state.user = user;
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+      state.accessToken = accessToken;
+      setLegacyToken(accessToken);
+    },
     logout: (state) => {
       state.user = null;
-      state.token = null;
-      localStorage.removeItem('token');
+      state.accessToken = null;
       localStorage.removeItem('user');
-    }
+      setLegacyToken(null);
+      // refresh token is cleared on backend via cookie
+    },
+    setInitialized: (state) => {
+      state.isInitialized = true;
+    },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(verifyToken.fulfilled, (state, action: PayloadAction<{ user: User, token: string }>) => {
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        localStorage.setItem('token', action.payload.token);
-        localStorage.setItem('user', JSON.stringify(action.payload.user));
-        state.status = 'succeeded';
-      })
-      .addCase(verifyToken.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message || 'Verification failed';
-      });
-  }
+    // Автоматически обновляем данные пользователя из RTK Query
+      builder.addMatcher(
+        (action) => action.type.endsWith('getProfile/fulfilled'),
+        (state, action: PayloadAction<{ success: boolean; data: User }>) => {
+          console.log('[AuthSlice] Profile fulfilled, updating user state');
+          if (action.payload?.success && action.payload.data) {
+            state.user = action.payload.data;
+            localStorage.setItem('user', JSON.stringify(action.payload.data));
+          }
+        }
+      );
+  },
 });
 
-export const { logout } = authSlice.actions;
-export const selectUser = (state: any) => state.auth.user;
+export const { setCredentials, logout, setInitialized } = authSlice.actions;
+
+export const selectCurrentUser = (state: { auth: AuthState }) => state.auth.user;
+export const selectCurrentToken = (state: { auth: AuthState }) => state.auth.accessToken;
 
 export default authSlice.reducer;

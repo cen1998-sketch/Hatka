@@ -1,44 +1,46 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Zap, Settings } from "lucide-react";
+import { Zap, Settings, Plus, Building2 } from "lucide-react";
 import { cn } from "../../../shared/lib/clsx.ts";
 import s from "./ListingsTable.module.css";
-// import Checkbox if needed, or implement native input
-// For now native input type checkbox
 import type { Property as PropertyDetail } from "../../../entities/property/model/types.ts";
 
-export function ListingRow({ listing }: { listing: PropertyDetail }) {
-  const [date, time] = listing.lastModified?.split(",") || ["", ""];
+export function RoomRow({ room, listing }: { room: any, listing: PropertyDetail }) {
+  const modDate = room.updatedAt ? new Date(room.updatedAt).toLocaleString("ru-RU") : "Недавно";
+  const [date, time] = modDate.split(",");
+  
+  const photos = Array.isArray(room.photos) ? room.photos : [];
+  const firstPhoto = photos[0]?.url;
 
   return (
     <div className={s.row}>
       <div className={s.cellCheckbox}>
-        <input type="checkbox" />
+        <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
       </div>
 
       <div className={s.cellInfo}>
         <div className={s.thumbBox}>
-          {listing.images && listing.images.length > 0 ? (
+          {firstPhoto ? (
             <img 
-              src={typeof listing.images[0] === 'string' ? listing.images[0] : listing.images[0].url} 
-              alt={listing.title}
+              src={firstPhoto.startsWith('http') ? firstPhoto : `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${firstPhoto}`} 
+              alt={room.title}
               className={s.thumbImg}
             />
           ) : (
              <div className={s.thumbPlaceholder}>
-               <span className={s.thumbPlaceholderText}>П</span>
+               <span className={s.thumbPlaceholderText}>{(room.title || room.type || "?")[0].toUpperCase()}</span>
              </div>
           )}
-          <span className={s.thumbBadge}>№ {listing.id}</span>
+          <span className={s.thumbBadge}>№ {room.id.slice(0, 4)}</span>
         </div>
         <div className={s.infoTextBox}>
           <Link 
-            to={listing.status === "ACTIVE" ? `/property/${listing.id}?preview=true` : `/dashboard/create/hotel/${listing.id}`} 
+            to={`/dashboard/create/hotel/${listing.id}`} 
             className={s.infoTitle}
           >
-            {listing.title}
+            {room.title || room.type || "Без названия"}
           </Link>
-          <p className={s.infoLocation}>{listing.location}</p>
+          <p className={s.infoLocation}>{listing.address || listing.city || "Адрес здания"}</p>
         </div>
       </div>
 
@@ -51,15 +53,16 @@ export function ListingRow({ listing }: { listing: PropertyDetail }) {
           )} />
           <span className={s.statusText}>
             {listing.status === "ACTIVE" ? "Опубликовано" : 
-             listing.status === "PENDING" ? "На модерации" : "Черновик"}
+             listing.status === "PENDING" ? "На модерации" : 
+             listing.status === "REJECTED" ? "Отклонено" : "Черновик"}
           </span>
         </div>
       </div>
 
       <div className={s.cellBooking}>
         <div className={s.bookingBadge}>
-          <Zap size={14} fill="#a3a3a3" />
-          <span className={s.bookingText}>выкл</span>
+          <Zap size={14} className={room.instantBooking ? "text-yellow-500 fill-yellow-500" : "text-gray-300"} />
+          <span className={s.bookingText}>{room.instantBooking ? "вкл" : "выкл"}</span>
         </div>
       </div>
 
@@ -68,7 +71,7 @@ export function ListingRow({ listing }: { listing: PropertyDetail }) {
       </div>
 
       <div className={s.cellPrice}>
-        <span className={s.dashMark}>—</span>
+        <span className="font-bold text-gray-900">{room.pricePerDay || 0} ₽</span>
       </div>
 
       <div className={s.cellModified}>
@@ -77,20 +80,22 @@ export function ListingRow({ listing }: { listing: PropertyDetail }) {
       </div>
 
       <div className={s.cellActions}>
-        <button className={s.actionBtn}>
+        <Link to={`/dashboard/create/hotel/${listing.id}`} className={s.actionBtn}>
           <Settings size={16} color="#737373" />
-        </button>
+        </Link>
       </div>
     </div>
   );
 }
 
 interface ListingsTableProps {
-  listings: PropertyDetail[];
+  listing: PropertyDetail;
   categoryTitle?: string;
 }
 
-export function ListingsTable({ listings, categoryTitle }: ListingsTableProps) {
+export function ListingsTable({ listing, categoryTitle }: ListingsTableProps) {
+  const rooms = (listing as any).rooms || [];
+
   return (
     <div className={s.container}>
       {categoryTitle && (
@@ -99,6 +104,27 @@ export function ListingsTable({ listings, categoryTitle }: ListingsTableProps) {
         </h2>
       )}
       <div className={s.tableWrapper}>
+        <div className={s.tableHeaderTop}>
+          <div className={s.buildingInfo}>
+            <h2 className={s.buildingName}>
+              <Building2 size={20} className="text-blue-600" />
+              {listing.title || listing.type}
+            </h2>
+            <p className={s.buildingAddress}>
+              {listing.city}, {listing.address}
+            </p>
+          </div>
+          <div className={s.headerActions}>
+            <Link to={`/dashboard/create/hotel/${listing.id}`} className={s.addRoomBtn}>
+              <Plus size={16} />
+              Добавить номер
+            </Link>
+            <Link to={`/dashboard/create/hotel/${listing.id}`} className={s.actionBtn}>
+              <Settings size={18} color="#737373" />
+            </Link>
+          </div>
+        </div>
+
         <div className={s.tableHeader}>
           <div />
           <div className={cn(s.headerCell, "pl-4")}>Объявление</div>
@@ -111,9 +137,21 @@ export function ListingsTable({ listings, categoryTitle }: ListingsTableProps) {
         </div>
 
         <div className={s.rowsContainer}>
-          {listings.map((listing) => (
-            <ListingRow key={listing.id} listing={listing} />
-          ))}
+          {rooms.length > 0 ? (
+            rooms.map((room: any) => (
+              <RoomRow key={room.id} room={room} listing={listing} />
+            ))
+          ) : (
+            <div className={s.emptyStateInner}>
+              <div className={s.emptyStateIcon}>
+                <Building2 size={32} />
+              </div>
+              <h4 className={s.emptyStateTitle}>Номера пока не добавлены</h4>
+              <p className={s.emptyStateSubtext}>
+                Добавьте категории проживания, чтобы гости смогли увидеть и забронировать ваш объект.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -16,7 +16,7 @@ export function DashboardHeader({ count }: DashboardHeaderProps) {
       
       <Link to="/dashboard/create" className={s.createBtn}>
         <Plus size={16} />
-        <span className={s.createBtnText}>Создать новое объявление</span>
+        <span className={s.createBtnText}>Добавить объект</span>
       </Link>
     </div>
   );

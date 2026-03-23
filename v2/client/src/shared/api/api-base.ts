@@ -2,13 +2,18 @@ import axios from 'axios';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001/api',
+  withCredentials: true,
 });
 
-// Add interceptors if needed (e.g., for auth tokens)
+// For legacy access to the token, we can set it here from the auth-slice
+let accessToken: string | null = null;
+export const setLegacyToken = (token: string | null) => {
+  accessToken = token;
+};
+
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
   }
   return config;
 });

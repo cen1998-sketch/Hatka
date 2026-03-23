@@ -156,3 +156,99 @@
 .applyButton:hover {
   background-color: #262626;
 }
+
+.smallTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #a3a3a3;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+  width: 100%;
+}
+
+.roomsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.counterRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.counterLabel {
+  font-size: 0.875rem;
+  color: #404040;
+}
+
+.counterControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.counterBtn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid #e5e5e5;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.counterBtn:hover {
+  border-color: #0a0a0a;
+  background: #fafafa;
+}
+
+.counterValue {
+  font-size: 0.875rem;
+  color: #171717;
+  font-weight: 600;
+  min-width: 2.5rem;
+  text-align: center;
+}
+
+.ratingSection {
+  width: 100%;
+}
+
+.ratingList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.ratingBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e5e5;
+  background: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ratingBtn:hover {
+  border-color: #f97316;
+}
+
+.ratingBtn.active {
+  background: #f97316;
+  border-color: #f97316;
+  color: white;
+}

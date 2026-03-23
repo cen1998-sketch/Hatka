@@ -1,115 +1,109 @@
 import * as React from "react";
 import { Input } from "../../../shared/ui/Input/Input";
 import { Label } from "../../../shared/ui/Label/Label";
-import { Star } from "lucide-react";
 import { cn } from "../../../shared/lib/clsx";
 
 interface PropertyBasicInfoFormProps {
   title?: string;
-  registryNumber?: string;
+  type?: string;
+  subType?: string;
   starRating?: number;
-  registryType?: string;
-  buildYear?: number;
-  totalRooms?: number;
+  mode?: 'titleOnly' | 'typeCategory' | 'additionalInfo';
   onChange: (data: any) => void;
 }
 
 export const PropertyBasicInfoForm: React.FC<PropertyBasicInfoFormProps> = ({
   title = "",
-  registryNumber = "",
+  type = "HOTEL_ROOM",
+  subType = "",
   starRating = 0,
-  registryType = "Гостиница",
-  buildYear,
-  totalRooms,
+  mode = 'titleOnly',
   onChange
 }) => {
-  return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-black text-gray-900">Основная информация</h2>
-        <p className="mt-2 text-gray-500">Заполните данные о вашем объекте для реестра и отображения гостям.</p>
+  if (mode === 'titleOnly') {
+    return (
+      <div className="space-y-4">
+        <Input
+          placeholder="Название"
+          value={title}
+          onChange={(e) => onChange({ title: e.target.value })}
+          className="h-12 border-none ring-1 ring-[var(--border)] focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
+        />
+        <p className="text-xs text-[var(--muted-foreground)]">
+          это название будут видеть гости при поиске (если у вас нет названия, можете указать название улицы, номер дома)
+        </p>
       </div>
+    );
+  }
 
+  if (mode === 'typeCategory') {
+    return (
       <div className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="title">Название объекта (для гостей)</Label>
-          <Input
-            id="title"
-            placeholder="Например, Отель Центральный"
-            value={title}
-            onChange={(e) => onChange({ title: e.target.value })}
-            className="h-12"
+        <p className="text-sm text-[var(--muted-foreground)] leading-relaxed mb-4">
+          Внесите информацию о вашем объекте из <a href="#" className="text-blue-500 underline hover:text-blue-600 transition-colors">Единого реестра</a>. 
+          После успешной проверки мы разместим эти данные для гостей
+        </p>
+        
+        <div className="grid grid-cols-[1fr,240px] items-center gap-6">
+          <Label className="text-sm text-[var(--foreground)] font-medium">Номер реестровой записи*</Label>
+          <Input 
+            placeholder="" 
+            className="h-10 border-[var(--border)] bg-[var(--background)]" 
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="registryNumber">Номер реестровой записи</Label>
-            <Input
-              id="registryNumber"
-              placeholder="0000-0000-00"
-              value={registryNumber}
-              onChange={(e) => onChange({ registryNumber: e.target.value })}
-              className="h-12"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="registryType">Тип по реестру</Label>
-            <Input
-              id="registryType"
-              value={registryType}
-              onChange={(e) => onChange({ registryType: e.target.value })}
-              className="h-12"
-            />
-          </div>
+        <div className="grid grid-cols-[1fr,240px] items-center gap-6">
+          <Label className="text-sm text-[var(--foreground)] font-medium">Категория средства размещения (звёзды)</Label>
+          <select 
+            value={starRating}
+            onChange={(e) => onChange({ starRating: Number(e.target.value) })}
+            className="h-10 px-3 bg-[var(--background)] border border-[var(--border)] rounded-[var(--radius)] text-sm outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all"
+          >
+            <option value={0}>выберите</option>
+            <option value={1}>1 звезда</option>
+            <option value={2}>2 звезды</option>
+            <option value={3}>3 звезды</option>
+            <option value={4}>4 звезды</option>
+            <option value={5}>5 звезд</option>
+          </select>
         </div>
 
-        <div className="space-y-4">
-          <Label>Классификация (Звезды)</Label>
-          <div className="flex gap-2">
-            {[0, 1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                onClick={() => onChange({ starRating: star })}
-                className={cn(
-                  "flex h-12 w-12 items-center justify-center rounded-xl border-2 transition-all",
-                  starRating === star 
-                    ? "border-blue-600 bg-blue-50 text-blue-600" 
-                    : "border-gray-100 hover:border-gray-200"
-                )}
-              >
-                {star === 0 ? "Без" : <div className="flex items-center gap-0.5">{star}<Star size={14} fill={starRating === star ? "currentColor" : "none"} /></div>}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="buildYear">Год постройки</Label>
-            <Input
-              id="buildYear"
-              type="number"
-              placeholder="2020"
-              value={buildYear || ""}
-              onChange={(e) => onChange({ buildYear: parseInt(e.target.value) || undefined })}
-              className="h-12"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="totalRooms">Общее кол-во номеров</Label>
-            <Input
-              id="totalRooms"
-              type="number"
-              placeholder="50"
-              value={totalRooms || ""}
-              onChange={(e) => onChange({ totalRooms: parseInt(e.target.value) || undefined })}
-              className="h-12"
-            />
-          </div>
+        <div className="grid grid-cols-[1fr,240px] items-center gap-6">
+          <Label className="text-sm text-[var(--foreground)] font-medium">Тип средства размещения (по реестру)</Label>
+          <Input 
+            placeholder="" 
+            className="h-10 border-[var(--border)] bg-[var(--background)]" 
+          />
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (mode === 'additionalInfo') {
+    return (
+      <div className="grid grid-cols-2 gap-8">
+        <div className="space-y-2">
+          <Label className="text-xs text-[var(--muted-foreground)] ml-1 font-bold uppercase tracking-wider">год постройки</Label>
+          <select 
+            className="w-full h-11 px-3 bg-[var(--background)] border border-[var(--border)] rounded-[var(--radius)] text-sm outline-none focus:ring-2 focus:ring-[var(--primary)]"
+          >
+            <option>выберите</option>
+            {Array.from({ length: 50 }, (_, i) => 2024 - i).map(year => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label className="text-xs text-[var(--muted-foreground)] ml-1 font-bold uppercase tracking-wider">Количество номеров</Label>
+          <Input 
+            type="number"
+            placeholder="0"
+            className="h-11 border-[var(--border)] bg-[var(--background)]"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return null;
 };

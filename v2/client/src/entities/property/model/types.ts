@@ -5,6 +5,16 @@ export type PaymentMethodType = 'CASH_ONLY' | 'CARD_ONLY' | 'CASH_AND_CARD' | 'A
 export type SmokingPolicy = 'FORBIDDEN' | 'DESIGNATED_AREAS' | 'ALLOWED';
 export type AdditionalServicePolicy = 'INCLUDED_IN_PRICE' | 'NOT_AVAILABLE' | 'AVAILABLE_FOR_FREE' | 'AVAILABLE_FOR_FEE';
 
+export interface Room {
+  id?: string;
+  title: string;
+  price: number;
+  capacity: number;
+  beds: number;
+  area?: number;
+  images?: string[];
+}
+
 export interface Property {
   id: string;
   ownerId?: string;
@@ -35,12 +45,13 @@ export interface Property {
   description?: string;
   pricePerNight: number;
   pricePer15Days?: number;
-  rooms: number;
+  rooms: number; // For normal property (number of rooms)
   bedrooms: number;
   beds: number;
   doubleBeds: number;
   maxGuests: number;
   area?: number;
+  hotelRooms?: Room[]; // For hotels/hostels
   
   // Правила
   checkIn?: string;
@@ -52,7 +63,8 @@ export interface Property {
   
   // Услуги и удобства
   internet?: InternetAvailability;
-  parkingEnum?: ParkingAvailability;
+  parking?: ParkingAvailability;
+  amenities?: string[];
   
   // Питание
   isAllInclusive: boolean;
@@ -73,13 +85,30 @@ export interface Property {
   avgRating?: number;
   reviewsCount?: number;
   lastModified?: string;
+  updatedAt?: string;
+  createdAt?: string;
   location?: string; // Legacy
   
   // Legacy fields (optional)
-  wifi?: string;
-  parking?: string;
   deposit?: string;
   moderationComment?: string;
+}
+
+export interface Booking {
+  id: string;
+  propertyId: string;
+  userId: string;
+  startDate: string;
+  endDate: string;
+  totalPrice: number;
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  createdAt: string;
+  property?: Property;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 
 export interface PropertyDraftState extends Partial<Property> {
@@ -91,6 +120,7 @@ export interface PropertyDraftState extends Partial<Property> {
 export interface PropertyState {
   data: Property[];
   draft: PropertyDraftState;
+  ownerBookings: Booking[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }

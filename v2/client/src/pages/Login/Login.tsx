@@ -105,7 +105,7 @@ export function Login() {
       {/* Right Column - Login Form */}
       <div className={s.rightCol}>
         <div className={s.closeHeader}>
-          <button onClick={() => navigate(-1)} className={s.closeButton}>
+          <button onClick={() => navigate('/')} className={s.closeButton}>
             <X size={20} color="#737373" />
           </button>
         </div>

@@ -2,6 +2,7 @@ import * as React from "react";
 import { Mail, Phone, ShieldCheck, MapPin, User as UserIcon, Loader2, Check } from "lucide-react";
 import { cn } from "../../shared/lib/clsx.ts";
 import s from "./ProfileEditor.module.css";
+import { useUpdateProfileMutation } from "../../entities/user/api/userApi.ts";
 
 export interface UserProfileData {
   name: string;
@@ -18,7 +19,7 @@ interface ProfileEditorProps {
 export function ProfileEditor({ initialData }: ProfileEditorProps) {
   const [formData, setFormData] = React.useState(initialData);
   const [editingField, setEditingField] = React.useState<"name" | "phone" | "city" | null>(null);
-  const [isSaving, setIsSaving] = React.useState(false);
+  const [updateProfile, { isLoading: isSaving }] = useUpdateProfileMutation();
 
   React.useEffect(() => {
     setFormData(initialData);
@@ -31,12 +32,18 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
     formData.city !== initialData.city;
 
   const handleSave = async () => {
-    setIsSaving(true);
-    // Имитация API
-    await new Promise(resolve => setTimeout(resolve, 800));
-    setIsSaving(false);
-    setEditingField(null);
-    // В реальности тут нужно обновить Redux store или перефетчить
+    try {
+      await updateProfile({
+        firstName: formData.name,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        city: formData.city,
+      }).unwrap();
+      setEditingField(null);
+    } catch (err) {
+      console.error("Failed to save profile:", err);
+      // Здесь можно добавить уведомление об ошибке
+    }
   };
 
   const combinedName = `${formData.name} ${formData.lastName}`.trim();

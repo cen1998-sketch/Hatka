@@ -6,14 +6,27 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useScrollDirection } from "../../shared/lib/hooks/use-scroll-direction.ts";
 import { useFavorites } from "../../shared/lib/hooks/use-favorites.ts";
-import { selectUser } from "../../entities/user/model/auth-slice.ts";
+import { useGetProfileQuery } from "../../entities/user/api/userApi.ts";
+import { selectCurrentToken, selectCurrentUser } from "../../entities/user/model/auth-slice.ts";
 import { cn } from "../../shared/lib/clsx.ts";
 import s from "./Header.module.css";
 
 export function Header() {
-  const user = useSelector(selectUser);
+  const token = useSelector(selectCurrentToken);
+  const userFromStore = useSelector(selectCurrentUser);
+  
+  // Автоматически запрашиваем профиль при загрузке (silent refresh через baseQueryWithReauth)
+  const { data: profileResponse } = useGetProfileQuery();
+  const user = profileResponse?.data || userFromStore;
+
   const { favorites } = useFavorites();
   const scrollDirection = useScrollDirection();
+  
+  const displayName = user?.firstName 
+    ? (user.lastName ? `${user.firstName} ${user.lastName[0].toUpperCase()}.` : user.firstName)
+    : (user?.email || "Пользователь");
+
+  const initials = user?.firstName ? user.firstName[0].toUpperCase() : (user?.email?.[0]?.toUpperCase() || "У");
   
   return (
     <header className={cn(
@@ -62,10 +75,10 @@ export function Header() {
         {user ? (
           <Link to="/profile" style={{ textDecoration: 'none' }}>
             <ProfileButton
-              name={user.name || "Пользователь"}
-              role={user.role === "landlord" ? "Арендодатель" : "Арендатор"}
-              avatarSrc={undefined} // Map user image if available
-              avatarFallback={user.name?.[0] || "У"}
+              name={displayName}
+              role={(user.role === "HOST" || user.role === "landlord" || user.role === "BOTH") ? "Арендодатель" : "Арендатор"}
+              avatarSrc={user.avatarUrl as string | undefined} 
+              avatarFallback={initials}
             />
           </Link>
         ) : (

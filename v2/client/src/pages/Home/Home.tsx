@@ -50,7 +50,7 @@ export function Home() {
                   </div>
                 ))
               ) : (
-                properties.map((property) => (
+                (Array.isArray(properties) ? properties : []).map((property) => (
                   <PropertyCard key={property.id} property={property} />
                 ))
               )}

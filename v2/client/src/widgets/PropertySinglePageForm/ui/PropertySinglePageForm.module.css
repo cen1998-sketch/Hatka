@@ -1,0 +1,265 @@
+.form {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+
+@media (min-width: 768px) {
+  .layout {
+    flex-direction: row;
+  }
+}
+
+.sidebar {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    width: 280px;
+    position: sticky;
+    top: 7rem;
+  }
+}
+
+.sidebarCard {
+  padding: 0.5rem;
+  border-radius: 1.5rem;
+  background: #fff;
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+  border: 0;
+  overflow: hidden;
+}
+
+.navItem {
+  width: 100%;
+  text-align: left;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #9CA3AF;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.navItem:hover {
+  background: #F9FAFB;
+}
+
+.activeNavItem {
+  background: #EFF6FF !important;
+  color: #2563EB !important;
+}
+
+.activeDot {
+  height: 6px;
+  width: 6px;
+  border-radius: 9999px;
+  background: #2563EB;
+}
+
+.mainContent {
+  flex: 1;
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.sectionCard {
+  padding: 2.5rem;
+  border-radius: 2rem;
+  background: #fff;
+  box-shadow: 0 20px 50px -12px rgba(0,0,0,0.04);
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+  color: #111827;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .grid2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.btnOption {
+  height: 3.5rem;
+  border-radius: 1rem;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  transition: all 0.2s;
+  background: #F9FAFB;
+  color: #9CA3AF;
+  border: none;
+  cursor: pointer;
+}
+
+.btnOption:hover {
+  background: #F3F4F6;
+}
+
+.activeOption {
+  background: #EFF6FF !important;
+  color: #2563EB !important;
+  box-shadow: 0 0 0 2px #DBEAFE;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6B7280;
+}
+
+.mealGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .mealGrid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.mealItem {
+  height: 5rem;
+  border-radius: 1rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: all 0.2s;
+  background: #F9FAFB;
+  color: #9CA3AF;
+  border: none;
+}
+
+.mealLabel {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  line-height: 1.25;
+}
+
+.activeMeal {
+  background: #FFF7ED !important;
+  color: #EA580C !important;
+  box-shadow: 0 0 0 2px #FFEDD5;
+}
+
+.ruleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.ruleItem {
+  height: 4.5rem;
+  border-radius: 1rem;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  transition: all 0.2s;
+  background: #F9FAFB;
+  color: #374151;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border: none;
+}
+
+.activeRule {
+  background: #F0FDF4 !important;
+  color: #16A34A !important;
+  box-shadow: 0 0 0 2px #DCFCE7;
+}
+
+.footer {
+  margin-top: 3rem;
+  padding: 2.5rem;
+  border-radius: 2rem;
+  background: #111827;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.submitBtn {
+  background: #2563EB;
+  color: #fff;
+  height: 4rem;
+  padding: 0 3rem;
+  border-radius: 1rem;
+  font-size: 1.125rem;
+  font-weight: 900;
+  transition: all 0.2s;
+  border: none;
+}
+
+.submitBtn:hover {
+  background: #1D4ED8;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

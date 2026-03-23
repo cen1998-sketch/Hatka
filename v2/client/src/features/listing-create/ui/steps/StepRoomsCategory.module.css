@@ -1,0 +1,188 @@
+.cardContainer {
+  background: white;
+  border-radius: 24px;
+  padding: 40px;
+  border: 1px solid #eef2f6;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 32px;
+  color: #0f172a;
+}
+
+.description {
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.optionGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.optionCard {
+  padding: 24px;
+  border-radius: 20px;
+  border: 2px solid #f1f5f9;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  gap: 20px;
+}
+
+.optionCard:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+}
+
+.optionCardActive {
+  border-color: #3E5CDE;
+  background-color: #f8fafc; /* Slightly darker than light blue for contrast */
+}
+
+.iconBox {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  transition: all 0.2s;
+}
+
+.optionCardActive .iconBox {
+  background-color: #3E5CDE;
+  color: white;
+}
+
+.optionInfo {
+  flex: 1;
+}
+
+.optionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.optionTitle {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 16px;
+}
+
+.optionSubtext {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.formArea {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #3E5CDE;
+}
+
+.listingList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.listingItem {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  background-color: white !important; /* Ensure it stays white even inside blue parent */
+  transition: all 0.2s;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.listingItem:hover {
+  border-color: #3E5CDE;
+  box-shadow: 0 4px 12px rgba(62, 92, 222, 0.1);
+}
+
+.listingImage {
+  width: 80px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.listingInfo {
+  flex: 1;
+  min-width: 0; /* Critical for ellipsis to work in flex */
+}
+
+.listingTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.listingMeta {
+  font-size: 14px;
+  color: #64748B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 4px;
+}
+
+.tipBox {
+  margin-top: 32px;
+  padding: 20px;
+  border-radius: 16px;
+  background-color: #f0f7ff;
+  border: 1px solid #e0f2fe;
+}
+
+.tipText {
+  font-size: 13px;
+  color: #0369a1;
+  line-height: 1.6;
+  font-weight: 500;
+}

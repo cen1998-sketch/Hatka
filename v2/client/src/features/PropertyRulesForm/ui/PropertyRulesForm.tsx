@@ -1,124 +1,96 @@
 import * as React from "react";
-import { Clock, Ban, CreditCard } from "lucide-react";
-import { Input } from "../../../shared/ui/Input/Input";
 import { Label } from "../../../shared/ui/Label/Label";
-import type { SmokingPolicy, PaymentMethodType } from "../../../entities/property/model/types";
 import { cn } from "../../../shared/lib/clsx";
 
 interface PropertyRulesFormProps {
   checkIn?: string;
   checkOut?: string;
-  smoking?: SmokingPolicy;
-  paymentMethod?: PaymentMethodType;
+  smoking?: string;
+  paymentMethod?: string;
+  mode?: 'timesOnly' | 'paymentOnly' | 'smokingOnly';
   onChange: (data: any) => void;
 }
-
-const SMOKING_OPTIONS = [
-  { value: 'FORBIDDEN', label: 'Запрещено', icon: <Ban size={18} /> },
-  { value: 'DESIGNATED_AREAS', label: 'В спец. местах', icon: <Ban size={18} className="opacity-50" /> },
-  { value: 'ALLOWED', label: 'Разрешено', icon: <Clock size={18} /> },
-];
-
-const PAYMENT_OPTIONS = [
-  { value: 'CASH_ONLY', label: 'Только наличные' },
-  { value: 'CARD_ONLY', label: 'Только карта' },
-  { value: 'CASH_AND_CARD', label: 'Наличные и карта' },
-];
 
 export const PropertyRulesForm: React.FC<PropertyRulesFormProps> = ({
   checkIn = "14:00",
   checkOut = "12:00",
   smoking = 'FORBIDDEN',
-  paymentMethod = 'ANY',
+  paymentMethod = 'CASH_AND_CARD',
+  mode = 'timesOnly',
   onChange
 }) => {
-  return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-black text-gray-900">Правила проживания</h2>
-        <p className="mt-2 text-gray-500">Установите время заезда, выезда и основные правила вашего объекта.</p>
-      </div>
-
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="checkIn" className="flex items-center gap-2">
-              <Clock size={16} /> Время заезда (с)
-            </Label>
-            <Input
-              id="checkIn"
-              type="time"
+  if (mode === 'timesOnly') {
+    return (
+      <div className="grid grid-cols-2 gap-8 max-w-md">
+        <div className="space-y-1">
+          <div className="relative">
+            <Label className="absolute -top-2 left-4 px-2 bg-white text-[10px] text-[var(--muted-foreground)] font-bold uppercase tracking-widest z-10">Заезд после</Label>
+            <select 
               value={checkIn}
               onChange={(e) => onChange({ checkIn: e.target.value })}
-              className="h-12"
-            />
+              className="w-full h-11 px-6 bg-[var(--background)] border border-[var(--border)] rounded-[var(--radius)] text-sm font-medium outline-none appearance-none focus:ring-2 focus:ring-[var(--primary)] transition-all"
+            >
+              {Array.from({ length: 24 }, (_, i) => `${i < 10 ? '0' : ''}${i}:00`).map(t => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="checkOut" className="flex items-center gap-2">
-              <Clock size={16} /> Время выезда (до)
-            </Label>
-            <Input
-              id="checkOut"
-              type="time"
+        </div>
+        <div className="space-y-1">
+          <div className="relative">
+            <Label className="absolute -top-2 left-4 px-2 bg-white text-[10px] text-[var(--muted-foreground)] font-bold uppercase tracking-widest z-10">Выезд до</Label>
+            <select 
               value={checkOut}
               onChange={(e) => onChange({ checkOut: e.target.value })}
-              className="h-12"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <Label className="flex items-center gap-2">
-            <Ban size={16} /> Курение на территории
-          </Label>
-          <div className="grid grid-cols-3 gap-3">
-            {SMOKING_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => onChange({ smoking: opt.value as SmokingPolicy })}
-                className={cn(
-                  "flex flex-col items-center gap-2 rounded-xl border-2 p-3 transition-all",
-                  smoking === opt.value
-                    ? "border-blue-600 bg-blue-50 text-blue-600"
-                    : "border-gray-100 hover:border-gray-200"
-                )}
-              >
-                {opt.icon}
-                <span className="text-sm font-medium">{opt.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <Label className="flex items-center gap-2">
-            <CreditCard size={16} /> Способ оплаты
-          </Label>
-          <div className="grid grid-cols-1 gap-2">
-            {PAYMENT_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => onChange({ paymentMethod: opt.value as PaymentMethodType })}
-                className={cn(
-                  "flex items-center justify-between rounded-xl border-2 px-4 py-3 transition-all",
-                  paymentMethod === opt.value
-                    ? "border-blue-600 bg-blue-50 text-blue-600"
-                    : "border-gray-100 hover:border-gray-200"
-                )}
-              >
-                <span className="font-medium">{opt.label}</span>
-                {paymentMethod === opt.value && (
-                  <div className="h-5 w-5 rounded-full bg-blue-600 p-1">
-                    <div className="h-full w-full rounded-full bg-white" />
-                  </div>
-                )}
-              </button>
-            ))}
+              className="w-full h-11 px-6 bg-[var(--background)] border border-[var(--border)] rounded-[var(--radius)] text-sm font-medium outline-none appearance-none focus:ring-2 focus:ring-[var(--primary)] transition-all"
+            >
+              {Array.from({ length: 24 }, (_, i) => `${i < 10 ? '0' : ''}${i}:00`).map(t => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (mode === 'paymentOnly' || mode === 'smokingOnly') {
+    const value = mode === 'paymentOnly' ? paymentMethod : smoking;
+    const field = mode === 'paymentOnly' ? 'paymentMethod' : 'smoking';
+    
+    const options = mode === 'paymentOnly' ? [
+      { id: 'CASH_ONLY', label: 'Только наличные' },
+      { id: 'CARD_ONLY', label: 'Только кредитные карты' },
+      { id: 'CASH_AND_CARD', label: 'Наличные и карты' },
+      { id: 'ANY', label: 'Любой способ' }
+    ] : [
+      { id: 'FORBIDDEN', label: 'Запрещено' },
+      { id: 'DESIGNATED_AREAS', label: 'Разрешено в специально отведённых местах' },
+      { id: 'ALLOWED', label: 'Разрешено везде' }
+    ];
+
+    return (
+      <div className="space-y-4">
+        {options.map(opt => (
+          <label key={opt.id} className="flex items-center gap-4 cursor-pointer group">
+            <div className={cn(
+              "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+              value === opt.id ? "border-[var(--primary)]" : "border-[var(--border)] bg-[var(--background)]"
+            )}>
+              {value === opt.id && <div className="w-3.5 h-3.5 rounded-full bg-[var(--primary)]" />}
+            </div>
+            <input 
+              type="radio" 
+              className="hidden" 
+              checked={value === opt.id}
+              onChange={() => onChange({ [field]: opt.id })}
+            />
+            <span className="text-sm text-[var(--foreground)] font-medium group-hover:text-[var(--primary)] transition-colors">{opt.label}</span>
+          </label>
+        ))}
+      </div>
+    );
+  }
+
+  return null;
 };

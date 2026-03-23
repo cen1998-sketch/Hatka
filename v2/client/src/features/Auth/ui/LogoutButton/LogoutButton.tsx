@@ -1,11 +1,17 @@
 import * as React from "react";
 import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useLogoutMutation } from "../../../../entities/user/api/authApi.ts";
+import { logout } from "../../../../entities/user/model/auth-slice.ts";
+import { baseApi } from "../../../../shared/api/baseApi.ts";
 import s from "./LogoutButton.module.css";
 
 export function LogoutButton() {
   const [isOpen, setIsOpen] = React.useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [logoutMutation] = useLogoutMutation();
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -15,9 +21,19 @@ export function LogoutButton() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
 
-  const handleLogout = () => {
-    // Иммитация логаута
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logoutMutation().unwrap();
+      dispatch(logout());
+      dispatch(baseApi.util.resetApiState());
+      setIsOpen(false);
+      navigate('/login');
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Fallback: force local logout even if api fails
+      dispatch(logout());
+      navigate('/login');
+    }
   };
 
   return (

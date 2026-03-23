@@ -35,7 +35,7 @@ export function CreateListing() {
                 description="Гостям будет предоставлен номер в отеле, гостевом доме или отдельное спальное место в хостеле"
               />
             </Link>
-            <Link to="/dashboard/create/hotel?type=Квартира" className={s.cardLink}>
+            <Link to="/host/add?type=Квартира" className={s.cardLink}>
               <CategoryCard 
                 icon={<Bed size={40} />}
                 title="квартиры, апартаменты"
@@ -43,7 +43,7 @@ export function CreateListing() {
                 description="Гости снимут квартиру целиком. Вместе со всеми удобствами и кухней"
               />
             </Link>
-            <Link to="/dashboard/create/hotel?type=Дом" className={s.cardLink}>
+            <Link to="/host/add?type=Дом" className={s.cardLink}>
               <CategoryCard 
                 icon={<Home size={40} />}
                 title="дома, коттеджи"
@@ -51,7 +51,7 @@ export function CreateListing() {
                 description="Гости снимут дом целиком. Вместе с пристройками и придомовой территорией"
               />
             </Link>
-            <Link to="/dashboard/create/hotel?type=Комната" className={s.cardLink}>
+            <Link to="/host/add?type=Комната" className={s.cardLink}>
               <CategoryCard 
                 icon={<DoorOpen size={40} />}
                 title="отдельные комнаты"

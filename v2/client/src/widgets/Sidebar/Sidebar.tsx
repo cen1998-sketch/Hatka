@@ -1,14 +1,19 @@
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../../app/store.ts";
+import { cn } from "../../shared/lib/clsx.ts";
 import { 
   setPriceRange, 
   setInstantBooking, 
-  setHousingTypes 
+  setHousingTypes,
+  toggleAmenity, 
+  setMinRating, 
+  setRoomFilters 
 } from "../../features/search-properties/model/search-slice.ts";
 import { Switch } from "../../shared/ui/Switch/Switch.tsx";
 import { Checkbox } from "../../shared/ui/Checkbox/Checkbox.tsx";
 import { Slider } from "../../shared/ui/Slider/Slider.tsx";
+import { Star, Minus, Plus } from "lucide-react";
 import s from "./Sidebar.module.css";
 
 const HOUSING_TYPES = [
@@ -25,7 +30,7 @@ const HOUSING_TYPES = [
 export function Sidebar() {
   const dispatch = useDispatch();
   const { 
-    minPrice, 
+    minPrice,
     maxPrice, 
     instantBooking, 
     housingTypes 
