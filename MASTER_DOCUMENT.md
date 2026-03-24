@@ -98,12 +98,7 @@
 
 ---
 
-## 10. API и Ошибки
-Все ответы следуют стандарту:
-```json
-{
-  "success": true,
-  "data": { ... }
-}
-```
-Ошибки: `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`.
+## 11. Правила поддержки проекта (Для AI)
+- **Обязательное чтение**: Перед началом работы всегда обращаться к `MASTER_DOCUMENT.md`, `MVP_Documentation.md`, `MVP_Documentation 2.md` и `SYSTEM_SPEC.md`.
+- **Актуализация**: Любое изменение в коде должно быть отражено в `MASTER_DOCUMENT.md`.
+- **Синхронизация**: Все внутренние инструкции в `.agents/instructions/` должны соответствовать этому документу.

@@ -58,8 +58,6 @@
 
 ---
 
-## 7. Инфраструктура и UI
-- **Стиль**: Glassmorphism, Vanilla CSS, премиальная типографика (Inter/Outfit).
-- **Карты**: DaData (Suggest) + Leaflet/2GIS (Map).
-- **GC**: Авто-удаление пустых черновиков спустя 48 часов.
-- **Уведомления**: Header (Колокольчик) + Email.
+## 8. Правила поддержки проекта (Для AI)
+- **Обязательное чтение**: Всегда сверяться с `MASTER_DOCUMENT.md`, `MVP_Documentation.md`, `MVP_Documentation 2.md` и `SYSTEM_SPEC.md`.
+- **Актуализация**: Поддерживать документы в актуальном состоянии согласно `.agents/instructions/documentation_rule.md`.
