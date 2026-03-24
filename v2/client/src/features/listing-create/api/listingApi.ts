@@ -131,6 +131,10 @@ export const listingCreateApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, { roomId }) => [{ type: 'Room', id: roomId }],
     }),
+    getOwnerBookings: build.query<any, void>({
+      query: () => '/bookings/owner',
+      providesTags: ['Booking'],
+    }),
   }),
   overrideExisting: false,
 })
@@ -153,4 +157,5 @@ export const {
   useUploadRoomPhotoMutation,
   useDeleteRoomPhotoMutation,
   useReorderRoomPhotosMutation,
+  useGetOwnerBookingsQuery,
 } = listingCreateApi

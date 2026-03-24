@@ -171,21 +171,47 @@ import { selectCurrentToken, logout as authLogout } from "../../entities/user/mo
 // --- MAIN COMPONENT ---
 export function ModerationDashboard() {
   const [activeTab, setActiveTab] = React.useState<"pending" | "published">("pending");
+  const [tabMarkers, setTabMarkers] = React.useState<Record<string, boolean>>({});
   const [searchId, setSearchId] = React.useState("");
   const [selectedUnit, setSelectedUnit] = React.useState<ModerationUnit | null>(null);
   const navigate = useNavigate();
   const token = useSelector(selectCurrentToken);
 
   // RTK Query Hooks
-  const { data: pendingData, isLoading: pendingLoading, refetch: refetchPending } = useGetPendingUnitsQuery(undefined, {
-    skip: activeTab !== "pending" || !token
+  const { data: pendingData, isLoading: pendingLoading } = useGetPendingUnitsQuery(undefined, {
+    skip: activeTab !== "pending" || !token,
+    pollingInterval: 10000,
+    refetchOnFocus: true,
   });
-  const { data: publishedData, isLoading: publishedLoading, refetch: refetchPublished } = useGetPublishedUnitsQuery(undefined, {
-    skip: activeTab !== "published" || !token
+  const { data: publishedData, isLoading: publishedLoading } = useGetPublishedUnitsQuery(undefined, {
+    skip: activeTab !== "published" || !token,
+    pollingInterval: 10000,
+    refetchOnFocus: true,
   });
 
   const [approveUnit] = useApproveUnitMutation();
   const [rejectUnit] = useRejectUnitMutation();
+
+  // Логика маркеров для модерации
+  React.useEffect(() => {
+    const lastVisits = JSON.parse(localStorage.getItem('mod_last_visits') || '{}');
+    const newMarkers: Record<string, boolean> = {};
+
+    const checkTab = (id: string, data: any) => {
+      if (id === activeTab) return;
+      const lastVisit = lastVisits[id] || 0;
+      const hasNew = data?.data?.some((u: any) => new Date(u.updatedAt || 0).getTime() > lastVisit);
+      if (hasNew) newMarkers[id] = true;
+    };
+
+    checkTab('pending', pendingData);
+    checkTab('published', publishedData);
+
+    setTabMarkers(newMarkers);
+    
+    lastVisits[activeTab] = Date.now();
+    localStorage.setItem('mod_last_visits', JSON.stringify(lastVisits));
+  }, [pendingData, publishedData, activeTab]);
 
   const units = (activeTab === "pending" ? pendingData?.data : publishedData?.data) || [];
   const loading = activeTab === "pending" ? pendingLoading : publishedLoading;
@@ -245,16 +271,20 @@ export function ModerationDashboard() {
           <button 
             className={cn(s.tabBtn, activeTab === "pending" && s.tabBtnActive)}
             onClick={() => setActiveTab("pending")}
+            style={{ position: 'relative' }}
           >
             <Clock size={16} />
-            Ожидают проверки ({units.length})
+            Ожидают проверки ({pendingData?.data?.length || 0})
+            {tabMarkers.pending && <div className={s.tabMarker} />}
           </button>
           <button 
             className={cn(s.tabBtn, activeTab === "published" && s.tabBtnActive)}
             onClick={() => setActiveTab("published")}
+            style={{ position: 'relative' }}
           >
             <CheckCircle size={16} />
             Активные
+            {tabMarkers.published && <div className={s.tabMarker} />}
           </button>
         </div>
 

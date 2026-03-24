@@ -1,11 +1,70 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Zap, Settings, Plus, Building2 } from "lucide-react";
+import { Zap, Settings, Plus, Building2, MoreHorizontal, Edit, Power, Trash2, FileEdit } from "lucide-react";
 import { cn } from "../../../shared/lib/clsx.ts";
 import s from "./ListingsTable.module.css";
 import type { Property as PropertyDetail } from "../../../entities/property/model/types.ts";
+import { 
+  useUpdateListingMutation, 
+  useDeleteListingMutation, 
+  useUpdateRoomMutation, 
+  useDeleteRoomMutation 
+} from "../../../features/listing-create/api/listingApi";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { ConfirmModal } from "../../../shared/ui/ConfirmModal/ConfirmModal";
 
-export function RoomRow({ room, listing }: { room: any, listing: PropertyDetail }) {
+function ActionMenu({ onAction, isRoom = false }: { onAction: (action: string) => void, isRoom?: boolean }) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className={s.actionMenuContainer} ref={menuRef}>
+      <button className={s.actionBtn} onClick={() => setIsOpen(!isOpen)}>
+        <Settings size={16} color="#737373" />
+      </button>
+      
+      {isOpen && (
+        <div className={s.dropdownMenu}>
+          <button className={s.menuItem} onClick={() => { onAction('edit'); setIsOpen(false); }}>
+            <Edit size={14} /> Редактировать
+          </button>
+          <button className={s.menuItem} onClick={() => { onAction('draft'); setIsOpen(false); }}>
+            <Power size={14} /> Снять с публикации
+          </button>
+          <button className={s.menuItem} onClick={() => { onAction('copy-draft'); setIsOpen(false); }}>
+            <FileEdit size={14} /> В черновик
+          </button>
+          <div style={{ height: '1px', backgroundColor: '#f1f5f9', margin: '4px 0' }} />
+          <button className={cn(s.menuItem, s.menuItemDanger)} onClick={() => { onAction('delete'); setIsOpen(false); }}>
+            <Trash2 size={14} /> Удалить
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface RoomRowProps {
+  room: any;
+  listing: PropertyDetail;
+  onShowConfirm: (title: string, message: string, onConfirm: () => void) => void;
+}
+
+export function RoomRow({ room, listing, onShowConfirm }: RoomRowProps) {
+  const [updateRoom] = useUpdateRoomMutation();
+  const [deleteRoom] = useDeleteRoomMutation();
+  
   const modDate = room.updatedAt ? new Date(room.updatedAt).toLocaleString("ru-RU") : "Недавно";
   const [date, time] = modDate.split(",");
   
@@ -48,13 +107,13 @@ export function RoomRow({ room, listing }: { room: any, listing: PropertyDetail 
         <div className={s.statusWrapper}>
           <div className={cn(
             s.statusDot,
-            listing.status === "ACTIVE" ? s.statusDotActive : 
-            listing.status === "PENDING" ? s.statusDotPending : s.statusDotDraft
+            room.status === "APPROVED" || room.status === "ACTIVE" ? s.statusDotActive : 
+            room.status === "PENDING" ? s.statusDotPending : s.statusDotDraft
           )} />
           <span className={s.statusText}>
-            {listing.status === "ACTIVE" ? "Опубликовано" : 
-             listing.status === "PENDING" ? "На модерации" : 
-             listing.status === "REJECTED" ? "Отклонено" : "Черновик"}
+            {room.status === "APPROVED" || room.status === "ACTIVE" ? "Опубликовано" : 
+             room.status === "PENDING" ? "На модерации" : 
+             room.status === "REJECTED" ? "Отклонено" : "Черновик"}
           </span>
         </div>
       </div>
@@ -80,9 +139,31 @@ export function RoomRow({ room, listing }: { room: any, listing: PropertyDetail 
       </div>
 
       <div className={s.cellActions}>
-        <Link to={`/dashboard/create/hotel/${listing.id}`} className={s.actionBtn}>
-          <Settings size={16} color="#737373" />
-        </Link>
+        <ActionMenu onAction={async (action) => {
+          if (action === 'edit') {
+            window.location.href = `/dashboard/create/hotel/${listing.id}?roomId=${room.id}`;
+            return;
+          }
+          if (action === 'draft' || action === 'copy-draft') {
+            onShowConfirm(
+              'Снять номер с публикации?',
+              'Этот номер перестанет отображаться для гостей и перейдет в раздел черновиков.',
+              async () => {
+                await updateRoom({ roomId: room.id, data: { status: 'DRAFT' } }).unwrap();
+              }
+            );
+            return;
+          }
+          if (action === 'delete') {
+            onShowConfirm(
+              'Удалить номер?',
+              'Вы уверены, что хотите безвозвратно удалить этот номер? Это действие нельзя отменить.',
+              async () => {
+                await deleteRoom(room.id).unwrap();
+              }
+            );
+          }
+        }} isRoom />
       </div>
     </div>
   );
@@ -93,8 +174,38 @@ interface ListingsTableProps {
   categoryTitle?: string;
 }
 
-export function ListingsTable({ listing, categoryTitle }: ListingsTableProps) {
-  const rooms = (listing as any).rooms || [];
+export function ListingsTable({ listing, categoryTitle, filterStatus }: ListingsTableProps & { filterStatus?: string }) {
+  const [updateListing] = useUpdateListingMutation();
+  const [deleteListing] = useDeleteListingMutation();
+  const [updateRoom] = useUpdateRoomMutation();
+  const [deleteRoom] = useDeleteRoomMutation();
+
+  const [confirmConfig, setConfirmConfig] = React.useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+
+  const showConfirm = (title: string, message: string, onConfirm: () => void) => {
+    setConfirmConfig({ isOpen: true, title, message, onConfirm });
+  };
+
+  let rooms = (listing as any).rooms || [];
+  
+  // Если передан фильтр, показываем только подходящие номера
+  if (filterStatus) {
+    rooms = rooms.filter((r: any) => {
+      // Маппинг для консистентности (на фронте ACTIVE, в базе APPROVED)
+      const mappedStatus = r.status === 'APPROVED' ? 'ACTIVE' : r.status;
+      return mappedStatus === filterStatus;
+    });
+  }
 
   return (
     <div className={s.container}>
@@ -115,14 +226,44 @@ export function ListingsTable({ listing, categoryTitle }: ListingsTableProps) {
             </p>
           </div>
           <div className={s.headerActions}>
-            <Link to={`/dashboard/create/hotel/${listing.id}`} className={s.addRoomBtn}>
+            <Link to={`/dashboard/create/hotel/${listing.id}?step=4`} className={s.addRoomBtn}>
               <Plus size={16} />
               Добавить номер
             </Link>
-            <Link to={`/dashboard/create/hotel/${listing.id}`} className={s.actionBtn}>
-              <Settings size={18} color="#737373" />
-            </Link>
+            <ActionMenu onAction={async (action) => {
+              if (action === 'edit') {
+                window.location.href = `/dashboard/create/hotel/${listing.id}`;
+                return;
+              }
+              if (action === 'draft' || action === 'copy-draft') {
+                showConfirm(
+                  'Снять все здание с публикации?',
+                  'Все номера в этом здании перестанут отображаться для гостей и перейдут в черновики.',
+                  async () => {
+                    await updateListing({ id: listing.id, data: { status: 'DRAFT' } }).unwrap();
+                  }
+                );
+                return;
+              }
+              if (action === 'delete') {
+                showConfirm(
+                  'Удалить всё здание?',
+                  'Вы уверены, что хотите безвозвратно удалить это здание со всеми его номерами?',
+                  async () => {
+                    await deleteListing(listing.id).unwrap();
+                  }
+                );
+              }
+            }} />
           </div>
+
+          <ConfirmModal 
+            isOpen={confirmConfig.isOpen}
+            title={confirmConfig.title}
+            message={confirmConfig.message}
+            onConfirm={confirmConfig.onConfirm}
+            onClose={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+          />
         </div>
 
         <div className={s.tableHeader}>
@@ -139,7 +280,12 @@ export function ListingsTable({ listing, categoryTitle }: ListingsTableProps) {
         <div className={s.rowsContainer}>
           {rooms.length > 0 ? (
             rooms.map((room: any) => (
-              <RoomRow key={room.id} room={room} listing={listing} />
+              <RoomRow 
+                key={room.id} 
+                room={room} 
+                listing={listing} 
+                onShowConfirm={showConfirm}
+              />
             ))
           ) : (
             <div className={s.emptyStateInner}>

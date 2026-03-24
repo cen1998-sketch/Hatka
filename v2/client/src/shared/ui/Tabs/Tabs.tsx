@@ -5,6 +5,7 @@ import s from "./Tabs.module.css";
 export interface TabItem {
   id: string;
   label: string;
+  hasMarker?: boolean;
 }
 
 export interface TabsProps {
@@ -26,6 +27,7 @@ export function Tabs({ items, activeId, onTabChange, className }: TabsProps) {
             className={cn(s.tabBtn, isActive ? s.tabBtnActive : s.tabBtnInactive)}
           >
             {item.label}
+            {item.hasMarker && <span className={s.marker} />}
           </button>
         );
       })}

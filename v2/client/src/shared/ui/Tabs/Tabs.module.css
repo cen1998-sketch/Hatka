@@ -17,6 +17,18 @@
   border: none;
   cursor: pointer;
   outline: none;
+  position: relative; /* Add this */
+}
+
+.marker {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  background-color: #ef4444; /* red-500 */
+  border-radius: 50%;
+  border: 1px solid white;
 }
 
 .tabBtn:focus-visible {

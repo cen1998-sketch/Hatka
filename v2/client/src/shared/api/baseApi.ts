@@ -15,44 +15,63 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
+// Mutex to prevent multiple simultaneous refresh attempts
+let isRefreshing = false;
+
 const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-  // Optional: check if we have a token or if we are already refreshing
+  // 1. Run the initial request
   let result = await baseQuery(args, api, extraOptions);
 
+  // 2. If it fails with 401, try to refresh
   if (result.error && result.error.status === 401) {
-    // If it's a 401, don't immediately logout, try refresh
-    if ((args as FetchArgs).url === '/auth/refresh') {
-       // If the refresh call itself is 401, then definitely logout
+    // If the call that failed IS refresh, don't try again
+    const url = typeof args === 'string' ? args : args.url;
+    if (url.includes('/auth/refresh')) {
        api.dispatch(logout());
        return result;
     }
-    // Try to get a new token via refresh endpoint (requires httpOnly cookie)
-    const refreshResult = await baseQuery(
-      { url: '/auth/refresh', method: 'POST' },
-      api,
-      extraOptions
-    );
 
-    console.log('[baseApi] /auth/refresh attempt. Result:', JSON.stringify(refreshResult));
+    if (!isRefreshing) {
+      isRefreshing = true;
+      try {
+        // Try to get a new token
+        const refreshResult = await baseQuery(
+          { url: '/auth/refresh', method: 'POST' },
+          api,
+          extraOptions
+        );
 
-    if (refreshResult.data) {
-      const res = refreshResult.data as { success: boolean; data: { accessToken: string } };
-      if (res.success && res.data.accessToken) {
-        console.log('[baseApi] Refresh success, retry original request');
-        api.dispatch(setCredentials({ accessToken: res.data.accessToken }));
-        
-        result = await baseQuery(args, api, extraOptions);
-      } else {
-        console.warn('[baseApi] Refresh returned success:false, logging out');
-        api.dispatch(logout());
+        console.log('[baseApi] /auth/refresh attempt. Result:', JSON.stringify(refreshResult));
+
+        if (refreshResult.data) {
+          const res = refreshResult.data as { success: boolean; data: { accessToken: string } };
+          if (res.success && res.data.accessToken) {
+            console.log('[baseApi] Refresh success, updating credentials');
+            api.dispatch(setCredentials({ accessToken: res.data.accessToken }));
+            
+            // 3. Retry the original request with the new state
+            // Explicitly clearing existing headers to let prepareHeaders set them correctly
+            const retryArgs = typeof args === 'string' ? args : { ...args, headers: new Headers((args as any).headers) };
+            result = await baseQuery(retryArgs, api, extraOptions);
+            
+            console.log('[baseApi] Retry result status:', result.error?.status || 'SUCCESS');
+          } else {
+            api.dispatch(logout());
+          }
+        } else {
+          api.dispatch(logout());
+        }
+      } finally {
+        isRefreshing = false;
       }
     } else {
-      console.error('[baseApi] Refresh failed (no data), logging out. Error:', JSON.stringify(refreshResult.error));
-      api.dispatch(logout());
+      // If already refreshing, we could wait or just return the 401
+      // For simplicity, we just return the error and let the component handle it or trigger a login
+      // result = await someMutationToWaitForRefresh(); 
     }
   }
   return result;
@@ -61,6 +80,6 @@ const baseQueryWithReauth: BaseQueryFn<
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['User', 'Listing', 'Referral', 'Subscription', 'Room'],
+  tagTypes: ['User', 'Listing', 'Referral', 'Subscription', 'Room', 'Booking'],
   endpoints: () => ({}),
 });

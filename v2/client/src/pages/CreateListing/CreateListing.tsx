@@ -3,8 +3,20 @@ import { Link } from "react-router-dom";
 import { Bed, Building2, Home, DoorOpen, ChevronLeft } from "lucide-react";
 import { CategoryCard } from "../../widgets/CreateListing/CategoryCard/CategoryCard.tsx";
 import s from "./CreateListing.module.css";
+import { useDispatch } from "react-redux";
+import { resetDraft } from "../../features/listing-create/model/listingSlice";
 
 export function CreateListing() {
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    dispatch(resetDraft());
+  }, [dispatch]);
+
+  const handleNewListing = () => {
+    dispatch(resetDraft());
+  };
+
   return (
     <div className={s.wrapper}>
       <div className={s.container}>
@@ -27,7 +39,7 @@ export function CreateListing() {
           <h2 className={s.sectionTitle}>Что будете сдавать?</h2>
           
           <div className={s.grid}>
-            <Link to="/dashboard/create/hotel?type=Гостиница" className={s.cardLink}>
+            <Link to="/dashboard/create/hotel?type=Гостиница" className={s.cardLink} onClick={handleNewListing}>
               <CategoryCard 
                 icon={<Building2 size={40} />}
                 title="номера, спальные места"
@@ -35,7 +47,7 @@ export function CreateListing() {
                 description="Гостям будет предоставлен номер в отеле, гостевом доме или отдельное спальное место в хостеле"
               />
             </Link>
-            <Link to="/host/add?type=Квартира" className={s.cardLink}>
+            <Link to="/host/add?type=Квартира" className={s.cardLink} onClick={handleNewListing}>
               <CategoryCard 
                 icon={<Bed size={40} />}
                 title="квартиры, апартаменты"
@@ -43,7 +55,7 @@ export function CreateListing() {
                 description="Гости снимут квартиру целиком. Вместе со всеми удобствами и кухней"
               />
             </Link>
-            <Link to="/host/add?type=Дом" className={s.cardLink}>
+            <Link to="/host/add?type=Дом" className={s.cardLink} onClick={handleNewListing}>
               <CategoryCard 
                 icon={<Home size={40} />}
                 title="дома, коттеджи"
@@ -51,7 +63,7 @@ export function CreateListing() {
                 description="Гости снимут дом целиком. Вместе с пристройками и придомовой территорией"
               />
             </Link>
-            <Link to="/host/add?type=Комната" className={s.cardLink}>
+            <Link to="/host/add?type=Комната" className={s.cardLink} onClick={handleNewListing}>
               <CategoryCard 
                 icon={<DoorOpen size={40} />}
                 title="отдельные комнаты"

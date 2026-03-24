@@ -4,7 +4,7 @@ import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom'
 import { ChevronLeft, AlertCircle } from 'lucide-react'
 import type { RootState } from '../../../app/store'
 import { updateDraft, setStep, setIsEditingRoom } from '../model/listingSlice'
-import { useGetListingQuery } from '../api/listingApi'
+import { useGetListingQuery, useUpdateListingMutation } from '../api/listingApi'
 import { Step1TypeCity } from './steps/Step1TypeCity'
 import { Step2MainInfo } from './steps/Step2MainInfo'
 import { StepPhotos } from './steps/StepPhotos'
@@ -37,6 +37,23 @@ export const ListingCreateWizard = () => {
 
   const localId = useSelector((state: RootState) => state.listingCreate.id)
 
+  const [updateListing] = useUpdateListingMutation()
+  const draft = useSelector((state: RootState) => state.listingCreate)
+
+  // Функция для очистки данных перед отправкой на бэкенд
+  const sanitizeDraft = (raw: any) => {
+    const allowedFields = [
+      'type', 'status', 'title', 'description', 'stepsCompleted',
+      'streetType', 'streetName', 'houseNumber', 'building', 'city', 'region',
+      'latitude', 'longitude', 'checkIn', 'checkOut', 'yearBuilt', 'roomCount',
+      'pricePerDay', 'details', 'amenities', 'moderationComment', 'moderationDetails'
+    ];
+    
+    return Object.fromEntries(
+      Object.entries(raw).filter(([key]) => allowedFields.includes(key))
+    );
+  };
+
   useEffect(() => {
     // Only initialize draft from API if we haven't loaded this specific ID yet or it's a new ID
     if (listingData?.data && localId !== listingData.data.id) {
@@ -47,6 +64,25 @@ export const ListingCreateWizard = () => {
       dispatch(updateDraft({ type: mappedType as any }))
     }
   }, [listingData, id, localId, searchParams, dispatch])
+
+  // Автосохранение при выходе или смене шага
+  const draftRef = React.useRef(draft)
+  useEffect(() => {
+    draftRef.current = draft
+  }, [draft])
+
+  useEffect(() => {
+    return () => {
+      const latestDraft = draftRef.current
+      if (latestDraft.id && latestDraft.stepsCompleted > 0) {
+        const { id } = latestDraft
+        const sanitizedData = sanitizeDraft(latestDraft)
+        console.log('[ListingCreateWizard] Auto-saving sanitized data:', { id, ...sanitizedData, status: 'DRAFT' })
+        // @ts-ignore
+        updateListing({ id, data: { ...sanitizedData, status: 'DRAFT' } })
+      }
+    }
+  }, [updateListing]) // Only depend on updateListing
 
   const steps = [
     { id: 1, label: 'Основная информация' },

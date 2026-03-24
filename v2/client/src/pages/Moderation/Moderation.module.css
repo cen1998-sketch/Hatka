@@ -176,6 +176,17 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
+.tabMarker {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background-color: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #f1f5f9;
+}
+
 .propertyList {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
